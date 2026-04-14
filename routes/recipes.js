@@ -38,12 +38,12 @@ router.get('/id/:id', async (req, res) => {
     const result = await pool.query(`
       SELECT r.*, c.name as category_name, c.slug as category_slug
       FROM recipes r LEFT JOIN categories c ON r.category_id = c.id
-      WHERE r.id = $1 AND r.is_published = true
+      WHERE r.id = $1
     `, [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Recipe not found' });
     res.json({ recipe: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: err.message });
   }
 });
 

@@ -337,10 +337,6 @@
                   Published
                 </label>
                 <label class="form-check">
-                  <toggle class="toggle-switch"><input type="checkbox" id="r-featured" /><span class="toggle-slider"></span></toggle>
-                  Featured on homepage
-                </label>
-                <label class="form-check">
                   <toggle class="toggle-switch"><input type="checkbox" id="r-vegan" /><span class="toggle-slider"></span></toggle>
                   Vegan
                 </label>
@@ -998,7 +994,6 @@
     document.getElementById('r-servings').value = '4';
     document.getElementById('r-notes').value = '';
     document.getElementById('r-published').checked = false;
-    document.getElementById('r-featured').checked = false;
     document.getElementById('r-vegan').checked = false;
     document.getElementById('r-image-url').value = '';
     document.getElementById('img-preview-el').style.display = 'none';
@@ -1023,7 +1018,6 @@
     document.getElementById('r-servings').value = r.base_servings || 4;
     document.getElementById('r-notes').value = r.notes || '';
     document.getElementById('r-published').checked = r.is_published;
-    document.getElementById('r-featured').checked = r.featured;
     document.getElementById('r-vegan').checked = r.is_vegan;
     document.getElementById('r-image-url').value = r.image_url || '';
     if (r.image_url) {
@@ -1117,7 +1111,6 @@
       notes: document.getElementById('r-notes').value,
       is_vegan: document.getElementById('r-vegan').checked,
       is_published: document.getElementById('r-published').checked,
-      featured: document.getElementById('r-featured').checked,
       image_url: document.getElementById('r-image-url').value || null,
     };
     if (!body.title || !body.slug) { showToast('Title and slug are required', 'error'); return; }

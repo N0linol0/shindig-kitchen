@@ -818,19 +818,28 @@ async function renderHomepageSections(sections) {
 
 async function renderHeroSection(s, config) {
   let recipe = null;
-  if (config.recipe_id) {
+  const recipeId = config.recipe_id ? parseInt(config.recipe_id) : null;
+  if (recipeId) {
     try {
-      const res = await fetch('/api/recipes/id/' + config.recipe_id);
-      const d = await res.json();
-      recipe = d.recipe;
+      const res = await fetch('/api/recipes/id/' + recipeId);
+      if (res.ok) {
+        const d = await res.json();
+        recipe = d.recipe || null;
+      }
     } catch(e) {}
   }
-  const title = config.title_override || (recipe ? recipe.title : 'Seasonal recipe');
+  const title = config.title_override || (recipe ? recipe.title : '');
   const desc = config.desc_override || (recipe ? recipe.description : '');
   const slug = recipe ? recipe.slug : '';
   const imgBg = recipe?.image_url
     ? `background-image:url('${recipe.image_url}');background-size:cover;background-position:center;`
     : 'background:linear-gradient(135deg,#5C7254 0%,#3D5438 45%,#263320 100%);';
+  // Don't render hero at all if no recipe selected and no override title
+  if (!recipe && !title) {
+    return `<div style="padding:3rem;text-align:center;color:var(--muted);background:#2C3B28;">
+      <p style="color:rgba(255,255,255,0.5);">Hero section: no recipe selected yet. Set one in the Homepage editor.</p>
+    </div>`;
+  }
   return `<div class="hero" style="position:relative;width:100%;height:580px;overflow:hidden;">
     <div style="position:absolute;inset:0;${imgBg}"></div>
     <div class="hero-fade"></div><div class="hero-fade-bottom"></div>
