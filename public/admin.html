@@ -1470,23 +1470,31 @@
 
   // ── CONTENT STRIP ──
   async function loadContentStrip() {
-    const res = await fetch('/api/content-strip/all');
-    const data = await res.json();
     const el = document.getElementById('strip-table-body');
-    if (!data.items || !data.items.length) {
-      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No items yet.</div>';
-      return;
+    try {
+      const res = await fetch('/api/content-strip/all');
+      if (!res.ok) {
+        el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Error ${res.status}: ${res.statusText}. Make sure you are logged in as admin.</div>`;
+        return;
+      }
+      const data = await res.json();
+      if (!data.items || !data.items.length) {
+        el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No items yet. Click "+ Add item" to create one.</div>';
+        return;
+      }
+      el.innerHTML = `<table><thead><tr><th>Position</th><th>Label</th><th>Type</th><th>Category slug</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+        data.items.map(i => `<tr>
+          <td style="color:var(--muted);">${i.position}</td>
+          <td><strong>${i.label}</strong></td>
+          <td><span class="badge badge-gray">${i.link_type}</span></td>
+          <td style="color:var(--muted);font-size:0.8rem;">${i.category_slug||i.url||'—'}</td>
+          <td><span class="badge ${i.is_active?'badge-green':'badge-gray'}">${i.is_active?'Visible':'Hidden'}</span></td>
+          <td><button class="btn btn-sm btn-outline" onclick="editStripItem(${JSON.stringify(i).replace(/"/g,'&quot;')})">Edit</button></td>
+        </tr>`).join('')
+      }</tbody></table>`;
+    } catch(e) {
+      el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Failed to load: ${e.message}</div>`;
     }
-    el.innerHTML = `<table><thead><tr><th>Position</th><th>Label</th><th>Type</th><th>Category slug</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
-      data.items.map(i => `<tr>
-        <td style="color:var(--muted);">${i.position}</td>
-        <td><strong>${i.label}</strong></td>
-        <td><span class="badge badge-gray">${i.link_type}</span></td>
-        <td style="color:var(--muted);font-size:0.8rem;">${i.category_slug||i.url||'—'}</td>
-        <td><span class="badge ${i.is_active?'badge-green':'badge-gray'}">${i.is_active?'Visible':'Hidden'}</span></td>
-        <td><button class="btn btn-sm btn-outline" onclick="editStripItem(${JSON.stringify(i).replace(/"/g,'&quot;')})">Edit</button></td>
-      </tr>`).join('')
-    }</tbody></table>`;
   }
 
   function showStripForm() {
@@ -1536,9 +1544,20 @@
     };
     if (!body.label) { showToast('Label is required','error'); return; }
     const url = id ? `/api/content-strip/${id}` : '/api/content-strip';
-    const res = await fetch(url, { method: id?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    if (res.ok) { showToast('Saved ✓','success'); document.getElementById('strip-form').style.display='none'; loadContentStrip(); }
-    else showToast('Error saving','error');
+    const method = id ? 'PUT' : 'POST';
+    try {
+      const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      if (res.ok) {
+        showToast('Saved ✓','success');
+        document.getElementById('strip-form').style.display='none';
+        loadContentStrip();
+      } else {
+        const err = await res.json().catch(()=>({error: res.statusText}));
+        showToast('Error: ' + (err.error||res.statusText), 'error');
+      }
+    } catch(e) {
+      showToast('Network error: ' + e.message, 'error');
+    }
   }
 
   async function deleteStripItem() {
