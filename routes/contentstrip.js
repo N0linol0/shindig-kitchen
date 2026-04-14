@@ -10,7 +10,8 @@ router.get('/', async (req, res) => {
     );
     res.json({ items: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('contentstrip GET /:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -19,7 +20,8 @@ router.get('/all', requireAdmin, async (req, res) => {
     const result = await pool.query('SELECT * FROM content_strip_items ORDER BY position ASC');
     res.json({ items: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('contentstrip GET /all:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -32,7 +34,8 @@ router.post('/', requireAdmin, async (req, res) => {
     );
     res.json({ item: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('contentstrip POST /:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -45,7 +48,8 @@ router.put('/:id', requireAdmin, async (req, res) => {
     );
     res.json({ item: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('contentstrip PUT /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -54,7 +58,8 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     await pool.query('DELETE FROM content_strip_items WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('contentstrip DELETE /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

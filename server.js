@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const path = require('path');
 const { pool } = require('./db/pool');
+const { initDB } = require('./db/init');
 
 const menuRoutes = require('./routes/menu');
 const homepageRoutes = require('./routes/homepage');
@@ -61,27 +62,25 @@ app.get('/setup-admin', async (req, res) => {
        ON CONFLICT (email) DO UPDATE SET password=$3, role='admin'`,
       [ADMIN_EMAIL, ADMIN_USERNAME || 'admin', hash, ADMIN_DISPLAY_NAME || 'Admin']
     );
-    res.send('Admin account created successfully. You can now log in at /admin — delete the ADMIN_PASSWORD variable from Railway for security.');
+    res.send('Admin account ready. Delete ADMIN_PASSWORD from Railway env vars.');
   } catch (err) {
     res.send('Error: ' + err.message);
   }
 });
 
-app.get('/recipe/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'recipe.html'));
-});
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-app.get('/shop', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'shop.html'));
-});
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/recipe/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/shop', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-app.listen(PORT, () => {
-  console.log(`Shindig Kitchen running on port ${PORT}`);
-});
+// Start only after DB is ready
+initDB()
+  .then(() => {
+    app.listen(PORT, () => console.log(`Shindig Kitchen running on port ${PORT}`));
+  })
+  .catch(err => {
+    console.error('Failed to initialise database:', err.message);
+    process.exit(1);
+  });
 
 module.exports = app;

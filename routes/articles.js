@@ -17,7 +17,23 @@ router.get('/', async (req, res) => {
     const result = await pool.query(query, params);
     res.json({ articles: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('articles GET /:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin - all articles (must come before /:slug)
+router.get('/admin/all', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT a.*, u.display_name as author_name FROM articles a
+      LEFT JOIN users u ON a.author_id = u.id
+      ORDER BY a.created_at DESC
+    `);
+    res.json({ articles: result.rows });
+  } catch (err) {
+    console.error('articles GET /admin/all:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -28,24 +44,11 @@ router.get('/:slug', async (req, res) => {
       FROM articles a LEFT JOIN users u ON a.author_id = u.id
       WHERE a.slug = $1 AND a.is_published = true
     `, [req.params.slug]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Article not found' });
+    if (!result.rows.length) return res.status(404).json({ error: 'Article not found' });
     res.json({ article: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Admin - all articles
-router.get('/admin/all', requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT a.*, u.display_name as author_name FROM articles a
-      LEFT JOIN users u ON a.author_id = u.id
-      ORDER BY a.created_at DESC
-    `);
-    res.json({ articles: result.rows });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('articles GET /:slug:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -55,11 +58,11 @@ router.post('/', requireAdmin, async (req, res) => {
     const result = await pool.query(`
       INSERT INTO articles (title, slug, subtitle, body, image_url, category, tags, is_published, featured, author_id)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *
-    `, [title, slug, subtitle, body, image_url, category, tags || [], is_published || false, featured || false, req.session.userId]);
+    `, [title, slug, subtitle, body, image_url, category, tags || [], is_published || false, featured || false, req.session.userId || null]);
     res.json({ article: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('articles POST /:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -71,9 +74,11 @@ router.put('/:id', requireAdmin, async (req, res) => {
       category=$6, tags=$7, is_published=$8, featured=$9, updated_at=NOW()
       WHERE id=$10 RETURNING *
     `, [title, slug, subtitle, body, image_url, category, tags || [], is_published, featured, req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Article not found' });
     res.json({ article: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('articles PUT /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -82,7 +87,8 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     await pool.query('DELETE FROM articles WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('articles DELETE /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

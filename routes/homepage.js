@@ -3,7 +3,8 @@ const { pool } = require('../db/pool');
 const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
-// Public — get all active sections for homepage rendering
+// Ensure table exists on first use
+// Public — get all active sections
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
@@ -11,7 +12,8 @@ router.get('/', async (req, res) => {
     );
     res.json({ sections: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('homepage GET /:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -23,7 +25,8 @@ router.get('/all', requireAdmin, async (req, res) => {
     );
     res.json({ sections: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('homepage GET /all:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -37,8 +40,8 @@ router.post('/', requireAdmin, async (req, res) => {
     );
     res.json({ section: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('homepage POST /:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -46,13 +49,16 @@ router.put('/:id', requireAdmin, async (req, res) => {
   const { type, title, position, is_active, config } = req.body;
   try {
     const result = await pool.query(
-      `UPDATE homepage_sections SET type=$1, title=$2, position=$3, is_active=$4, config=$5
+      `UPDATE homepage_sections
+       SET type=$1, title=$2, position=$3, is_active=$4, config=$5, updated_at=NOW()
        WHERE id=$6 RETURNING *`,
       [type, title, position, is_active, JSON.stringify(config || {}), req.params.id]
     );
+    if (!result.rows.length) return res.status(404).json({ error: 'Section not found' });
     res.json({ section: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('homepage PUT /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -61,7 +67,8 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     await pool.query('DELETE FROM homepage_sections WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('homepage DELETE /:id:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
