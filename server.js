@@ -35,22 +35,15 @@ app.use(session({
   }
 }));
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Coming soon mode — set COMING_SOON=true in Railway env vars to enable
-// To preview the site while coming soon is active, add ?preview=YOUR_PREVIEW_TOKEN to any URL
-// Set PREVIEW_TOKEN in Railway env vars (any string you choose)
+// Coming soon mode — must be before static files
 app.use((req, res, next) => {
   if (process.env.COMING_SOON !== 'true') return next();
-  // Always allow: admin, API routes, static assets, uploads
   if (
     req.path.startsWith('/admin') ||
     req.path.startsWith('/api/') ||
     req.path.startsWith('/uploads/') ||
     req.path.match(/\.(js|css|png|jpg|jpeg|webp|svg|ico|woff|woff2)$/)
   ) return next();
-  // Allow preview via token in query string or cookie
   const token = process.env.PREVIEW_TOKEN;
   if (token) {
     if (req.query.preview === token) {
@@ -59,9 +52,11 @@ app.use((req, res, next) => {
     }
     if (req.cookies && req.cookies.preview_token === token) return next();
   }
-  // Show coming soon page
   res.sendFile(path.join(__dirname, 'public', 'coming-soon.html'));
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/menu', menuRoutes);
 app.use('/api/homepage', homepageRoutes);
