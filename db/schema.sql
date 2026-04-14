@@ -155,3 +155,23 @@ INSERT INTO menu_items (label, url, page_type, position) VALUES
   ('Seasonal', '/seasonal', 'category', 3),
   ('Shop', '/shop', 'shop', 4)
 ON CONFLICT DO NOTHING;
+
+-- HOMEPAGE SECTIONS
+CREATE TABLE IF NOT EXISTS homepage_sections (
+  id          SERIAL PRIMARY KEY,
+  type        VARCHAR(50) NOT NULL,
+  title       VARCHAR(255),
+  position    INTEGER DEFAULT 99,
+  is_active   BOOLEAN DEFAULT TRUE,
+  config      JSONB DEFAULT '{}',
+  created_at  TIMESTAMP DEFAULT NOW(),
+  updated_at  TIMESTAMP DEFAULT NOW()
+);
+
+-- Default sections
+INSERT INTO homepage_sections (type, title, position, is_active, config) VALUES
+  ('hero', 'Featured this week', 1, true, '{"recipe_id": null, "tag": "✦ Featured this week"}'),
+  ('recipes', 'Recent recipes', 2, true, '{"recipe_ids": [], "sort": "newest", "limit": 6}'),
+  ('shop_teaser', 'From our kitchen', 3, true, '{"description": "A curated selection of small-batch jams, pickles, and condiments made from the same recipes on this site.", "product_ids": []}'),
+  ('spotlight', 'Canning school', 4, true, '{"description": "From water bath basics to pressure canning, we''ve got you covered — step by step, jar by jar.", "tiles": [{"emoji": "🫙", "name": "Water Bath Canning", "count": "12 recipes", "url": "/canning"}, {"emoji": "🧄", "name": "Pickles & Brines", "count": "18 recipes", "url": "/pickles"}, {"emoji": "🍓", "name": "Jams & Jellies", "count": "24 recipes", "url": "/canning"}, {"emoji": "🌶️", "name": "Ferments & Hot Sauces", "count": "9 recipes", "url": "/pickles"}]}')
+ON CONFLICT DO NOTHING;

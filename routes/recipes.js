@@ -4,23 +4,45 @@ const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { category, featured, limit = 12, offset = 0 } = req.query;
+  const { category, featured, limit = 12, offset = 0, sort, ids } = req.query;
   try {
-    let query = `
-      SELECT r.*, c.name as category_name, c.slug as category_slug
-      FROM recipes r
-      LEFT JOIN categories c ON r.category_id = c.id
-      WHERE r.is_published = true
-    `;
-    const params = [];
-    if (category) { params.push(category); query += ` AND c.slug = $${params.length}`; }
-    if (featured) { query += ` AND r.featured = true`; }
-    params.push(limit); query += ` ORDER BY r.created_at DESC LIMIT $${params.length}`;
-    params.push(offset); query += ` OFFSET $${params.length}`;
+    let query, params;
+    if (ids) {
+      const idList = ids.split(',').map(Number).filter(Boolean);
+      if (!idList.length) return res.json({ recipes: [] });
+      query = `SELECT r.*, c.name as category_name, c.slug as category_slug
+        FROM recipes r LEFT JOIN categories c ON r.category_id = c.id
+        WHERE r.is_published = true AND r.id = ANY($1)`;
+      params = [idList];
+    } else {
+      query = `SELECT r.*, c.name as category_name, c.slug as category_slug
+        FROM recipes r LEFT JOIN categories c ON r.category_id = c.id
+        WHERE r.is_published = true`;
+      params = [];
+      if (category) { params.push(category); query += ` AND c.slug = $${params.length}`; }
+      if (featured) { query += ` AND r.featured = true`; }
+      const orderBy = sort === 'liked' ? 'r.like_count DESC' : 'r.created_at DESC';
+      params.push(limit); query += ` ORDER BY ${orderBy} LIMIT $${params.length}`;
+      params.push(offset); query += ` OFFSET $${params.length}`;
+    }
     const result = await pool.query(query, params);
     res.json({ recipes: result.rows });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/id/:id', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.*, c.name as category_name, c.slug as category_slug
+      FROM recipes r LEFT JOIN categories c ON r.category_id = c.id
+      WHERE r.id = $1 AND r.is_published = true
+    `, [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Recipe not found' });
+    res.json({ recipe: result.rows[0] });
+  } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 });

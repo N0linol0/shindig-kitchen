@@ -182,6 +182,9 @@
         <div class="nav-item" onclick="showSection('comments')">
           <span class="nav-item-icon">💬</span> Comments
         </div>
+        <div class="nav-item" onclick="showSection('homepage')">
+          <span class="nav-item-icon">🏠</span> Homepage editor
+        </div>
         <div class="nav-item" onclick="showSection('menu')">
           <span class="nav-item-icon">☰</span> Navigation menu
         </div>
@@ -432,6 +435,150 @@
         </div>
       </div>
 
+      <!-- HOMEPAGE EDITOR -->
+      <div id="section-homepage" class="admin-section">
+        <div class="page-title">Homepage editor</div>
+        <div class="page-sub">Build your homepage by adding, reordering, and configuring sections. Each section can be shown or hidden independently.</div>
+
+        <div style="display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-green" onclick="addHomepageSection('hero')">+ Featured hero</button>
+          <button class="btn btn-sm btn-green" onclick="addHomepageSection('recipes')">+ Recipe grid</button>
+          <button class="btn btn-sm btn-green" onclick="addHomepageSection('shop_teaser')">+ Shop teaser</button>
+          <button class="btn btn-sm btn-green" onclick="addHomepageSection('spotlight')">+ Spotlight</button>
+          <button class="btn btn-sm btn-green" onclick="addHomepageSection('rich_text')">+ Text block</button>
+        </div>
+
+        <div id="homepage-sections-list">
+          <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div>
+        </div>
+
+        <!-- SECTION EDITOR PANEL -->
+        <div id="hp-editor" style="display:none;margin-top:1.5rem;">
+          <div class="editor-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+              <div class="editor-card-title" id="hp-editor-title" style="margin-bottom:0;">Edit section</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="saveHomepageSection()">Save section</button>
+                <button class="btn btn-sm btn-outline" onclick="document.getElementById('hp-editor').style.display='none'">Cancel</button>
+                <button class="btn btn-sm btn-danger" id="hp-delete-btn" onclick="deleteHomepageSection()">Delete</button>
+              </div>
+            </div>
+            <input type="hidden" id="hp-id" />
+            <input type="hidden" id="hp-type" />
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Section title</label>
+                <input class="form-input" id="hp-title" placeholder="e.g. Recent recipes" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Position (order)</label>
+                <input class="form-input" type="number" id="hp-position" placeholder="1" />
+              </div>
+            </div>
+            <div class="form-field" style="margin-bottom:1.25rem;">
+              <label class="form-check">
+                <input type="checkbox" id="hp-active" checked /> Visible on homepage
+              </label>
+            </div>
+
+            <!-- HERO CONFIG -->
+            <div id="hp-config-hero" class="hp-config" style="display:none;">
+              <div class="editor-card-title">Hero settings</div>
+              <div class="form-field">
+                <label class="form-label">Tag line (small text above title)</label>
+                <input class="form-input" id="hp-hero-tag" placeholder="✦ Featured this week" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Featured recipe</label>
+                <select class="form-input form-select" id="hp-hero-recipe">
+                  <option value="">Loading recipes...</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Title override (leave blank to use recipe title)</label>
+                <input class="form-input" id="hp-hero-title-override" placeholder="Optional custom title" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Description override (leave blank to use recipe description)</label>
+                <textarea class="form-input form-textarea" id="hp-hero-desc-override" placeholder="Optional custom description"></textarea>
+              </div>
+            </div>
+
+            <!-- RECIPES CONFIG -->
+            <div id="hp-config-recipes" class="hp-config" style="display:none;">
+              <div class="editor-card-title">Recipe grid settings</div>
+              <div class="form-field">
+                <label class="form-label">Display mode</label>
+                <select class="form-input form-select" id="hp-recipes-mode" onchange="toggleRecipeMode()">
+                  <option value="newest">Newest recipes (automatic)</option>
+                  <option value="liked">Most liked (automatic)</option>
+                  <option value="manual">Manual selection</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Number of recipes to show</label>
+                <select class="form-input form-select" id="hp-recipes-limit">
+                  <option value="3">3</option>
+                  <option value="6" selected>6</option>
+                  <option value="9">9</option>
+                  <option value="12">12</option>
+                </select>
+              </div>
+              <div id="hp-recipes-manual" style="display:none;">
+                <label class="form-label" style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:8px;">Select recipes (in order)</label>
+                <div id="hp-recipe-slots"></div>
+                <button class="btn-add" onclick="addRecipeSlot()">+ Add recipe</button>
+              </div>
+            </div>
+
+            <!-- SHOP TEASER CONFIG -->
+            <div id="hp-config-shop_teaser" class="hp-config" style="display:none;">
+              <div class="editor-card-title">Shop teaser settings</div>
+              <div class="form-field">
+                <label class="form-label">Description</label>
+                <textarea class="form-input form-textarea" id="hp-shop-desc" placeholder="A short description of your shop..."></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Products to feature (select up to 4)</label>
+                <div id="hp-shop-product-slots"></div>
+                <button class="btn-add" onclick="addProductSlot()">+ Add product</button>
+              </div>
+            </div>
+
+            <!-- SPOTLIGHT CONFIG -->
+            <div id="hp-config-spotlight" class="hp-config" style="display:none;">
+              <div class="editor-card-title">Spotlight settings</div>
+              <div class="form-field">
+                <label class="form-label">Description</label>
+                <textarea class="form-input form-textarea" id="hp-spotlight-desc" placeholder="A short intro paragraph..."></textarea>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Button label</label>
+                <input class="form-input" id="hp-spotlight-btn" placeholder="Explore the guide →" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Button URL</label>
+                <input class="form-input" id="hp-spotlight-url" placeholder="/canning" />
+              </div>
+              <label class="form-label" style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:8px;">Tiles</label>
+              <div id="hp-spotlight-tiles"></div>
+              <button class="btn-add" onclick="addSpotlightTile()">+ Add tile</button>
+            </div>
+
+            <!-- RICH TEXT CONFIG -->
+            <div id="hp-config-rich_text" class="hp-config" style="display:none;">
+              <div class="editor-card-title">Text block</div>
+              <div class="form-field">
+                <label class="form-label">Content (HTML supported)</label>
+                <textarea class="form-input form-textarea" id="hp-rich-content" style="min-height:160px;" placeholder="<p>Your content here...</p>"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       <!-- MENU MANAGEMENT -->
       <div id="section-menu" class="admin-section">
         <div class="page-title">Navigation menu</div>
@@ -551,6 +698,7 @@
     if (name === 'products') loadProducts();
     if (name === 'comments') loadComments();
     if (name === 'menu') loadMenuItems();
+    if (name === 'homepage') loadHomepageSections();
   }
 
   // DASHBOARD
@@ -991,6 +1139,187 @@
     showToast('Item deleted', 'success');
     document.getElementById('menu-form').style.display = 'none';
     loadMenuItems();
+  }
+
+  // ── HOMEPAGE EDITOR ──
+  let allRecipes = [], allProducts = [];
+  let hpRecipeSlots = [], hpProductSlots = [], hpTiles = [];
+
+  async function loadHomepageSections() {
+    const [sectRes, recRes, prodRes] = await Promise.all([
+      fetch('/api/homepage/all'),
+      fetch('/api/admin/recipes'),
+      fetch('/api/admin/products'),
+    ]);
+    const sectData = await sectRes.json();
+    const recData = await recRes.json();
+    const prodData = await prodRes.json();
+    allRecipes = recData.recipes || [];
+    allProducts = prodData.products || [];
+    renderHomepageSectionsList(sectData.sections || []);
+  }
+
+  function renderHomepageSectionsList(sections) {
+    const el = document.getElementById('homepage-sections-list');
+    if (!sections.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No sections yet. Add one above.</div>';
+      return;
+    }
+    const typeLabels = { hero:'Hero / Featured', recipes:'Recipe grid', shop_teaser:'Shop teaser', spotlight:'Spotlight', rich_text:'Text block' };
+    el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Position</th><th>Type</th><th>Title</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+      sections.map(s => `<tr>
+        <td style="color:var(--muted);">${s.position}</td>
+        <td><span class="badge badge-gray">${typeLabels[s.type]||s.type}</span></td>
+        <td><strong>${s.title||'—'}</strong></td>
+        <td><span class="badge ${s.is_active?'badge-green':'badge-gray'}">${s.is_active?'Visible':'Hidden'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-sm btn-outline" onclick='editHomepageSection(${JSON.stringify(s).replace(/'/g,"&#39;")})'>Edit</button>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table></div>`;
+  }
+
+  async function addHomepageSection(type) {
+    const defaults = {
+      hero: { title:'Featured this week', config:{ tag:'✦ Featured this week', recipe_id:null } },
+      recipes: { title:'Recent recipes', config:{ mode:'newest', limit:6, recipe_ids:[] } },
+      shop_teaser: { title:'From our kitchen', config:{ description:'', product_ids:[] } },
+      spotlight: { title:'Canning school', config:{ description:'', btn_label:'Explore the guide →', btn_url:'/', tiles:[] } },
+      rich_text: { title:'Text block', config:{ content:'' } },
+    };
+    const d = defaults[type];
+    const res = await fetch('/api/homepage', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ type, title: d.title, position:99, is_active:true, config: d.config })
+    });
+    const data = await res.json();
+    if (res.ok) { showToast('Section added ✓', 'success'); loadHomepageSections(); editHomepageSection(data.section); }
+    else showToast('Error adding section', 'error');
+  }
+
+  function editHomepageSection(s) {
+    const config = typeof s.config === 'string' ? JSON.parse(s.config) : (s.config || {});
+    document.getElementById('hp-id').value = s.id;
+    document.getElementById('hp-type').value = s.type;
+    document.getElementById('hp-title').value = s.title || '';
+    document.getElementById('hp-position').value = s.position;
+    document.getElementById('hp-active').checked = s.is_active;
+    document.getElementById('hp-editor-title').textContent = 'Edit: ' + (s.title || s.type);
+
+    document.querySelectorAll('.hp-config').forEach(el => el.style.display = 'none');
+    const configEl = document.getElementById('hp-config-' + s.type);
+    if (configEl) configEl.style.display = 'block';
+
+    if (s.type === 'hero') {
+      document.getElementById('hp-hero-tag').value = config.tag || '';
+      document.getElementById('hp-hero-title-override').value = config.title_override || '';
+      document.getElementById('hp-hero-desc-override').value = config.desc_override || '';
+      const sel = document.getElementById('hp-hero-recipe');
+      sel.innerHTML = '<option value="">— No recipe selected —</option>' +
+        allRecipes.map(r => `<option value="${r.id}" ${r.id==config.recipe_id?'selected':''}>${r.title}</option>`).join('');
+    }
+    if (s.type === 'recipes') {
+      document.getElementById('hp-recipes-mode').value = config.mode || 'newest';
+      document.getElementById('hp-recipes-limit').value = config.limit || 6;
+      hpRecipeSlots = (config.recipe_ids || []).map(id => ({ id }));
+      toggleRecipeMode();
+      renderRecipeSlots();
+    }
+    if (s.type === 'shop_teaser') {
+      document.getElementById('hp-shop-desc').value = config.description || '';
+      hpProductSlots = (config.product_ids || []).map(id => ({ id }));
+      renderProductSlots();
+    }
+    if (s.type === 'spotlight') {
+      document.getElementById('hp-spotlight-desc').value = config.description || '';
+      document.getElementById('hp-spotlight-btn').value = config.btn_label || '';
+      document.getElementById('hp-spotlight-url').value = config.btn_url || '';
+      hpTiles = JSON.parse(JSON.stringify(config.tiles || []));
+      renderSpotlightTiles();
+    }
+    if (s.type === 'rich_text') {
+      document.getElementById('hp-rich-content').value = config.content || '';
+    }
+
+    document.getElementById('hp-editor').style.display = 'block';
+    document.getElementById('hp-editor').scrollIntoView({ behavior:'smooth' });
+  }
+
+  function toggleRecipeMode() {
+    const mode = document.getElementById('hp-recipes-mode').value;
+    document.getElementById('hp-recipes-manual').style.display = mode === 'manual' ? 'block' : 'none';
+  }
+
+  function addRecipeSlot() { hpRecipeSlots.push({ id:'' }); renderRecipeSlots(); }
+  function removeRecipeSlot(i) { hpRecipeSlots.splice(i,1); renderRecipeSlots(); }
+  function renderRecipeSlots() {
+    const el = document.getElementById('hp-recipe-slots');
+    el.innerHTML = hpRecipeSlots.map((slot, i) => `
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <select class="form-input form-select" style="flex:1;" onchange="hpRecipeSlots[${i}].id=parseInt(this.value)||''">
+          <option value="">— Select recipe —</option>
+          ${allRecipes.map(r=>`<option value="${r.id}" ${r.id==slot.id?'selected':''}>${r.title}</option>`).join('')}
+        </select>
+        <button class="btn-remove" onclick="removeRecipeSlot(${i})" style="margin-top:0;">×</button>
+      </div>`).join('');
+  }
+
+  function addProductSlot() { hpProductSlots.push({ id:'' }); renderProductSlots(); }
+  function removeProductSlot(i) { hpProductSlots.splice(i,1); renderProductSlots(); }
+  function renderProductSlots() {
+    const el = document.getElementById('hp-shop-product-slots');
+    el.innerHTML = hpProductSlots.map((slot, i) => `
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <select class="form-input form-select" style="flex:1;" onchange="hpProductSlots[${i}].id=parseInt(this.value)||''">
+          <option value="">— Select product —</option>
+          ${allProducts.map(p=>`<option value="${p.id}" ${p.id==slot.id?'selected':''}>${p.name} — $${parseFloat(p.price).toFixed(2)}</option>`).join('')}
+        </select>
+        <button class="btn-remove" onclick="removeProductSlot(${i})" style="margin-top:0;">×</button>
+      </div>`).join('');
+  }
+
+  function addSpotlightTile() { hpTiles.push({ emoji:'', name:'', count:'', url:'' }); renderSpotlightTiles(); }
+  function removeSpotlightTile(i) { hpTiles.splice(i,1); renderSpotlightTiles(); }
+  function renderSpotlightTiles() {
+    const el = document.getElementById('hp-spotlight-tiles');
+    el.innerHTML = hpTiles.map((t, i) => `
+      <div style="display:grid;grid-template-columns:50px 1fr 100px 120px 32px;gap:8px;margin-bottom:8px;align-items:center;">
+        <input class="form-input" placeholder="🫙" value="${t.emoji}" oninput="hpTiles[${i}].emoji=this.value" style="text-align:center;" />
+        <input class="form-input" placeholder="Tile label" value="${t.name}" oninput="hpTiles[${i}].name=this.value" />
+        <input class="form-input" placeholder="12 recipes" value="${t.count}" oninput="hpTiles[${i}].count=this.value" />
+        <input class="form-input" placeholder="/canning" value="${t.url}" oninput="hpTiles[${i}].url=this.value" />
+        <button class="btn-remove" onclick="removeSpotlightTile(${i})" style="margin-top:0;">×</button>
+      </div>`).join('');
+  }
+
+  async function saveHomepageSection() {
+    const id = document.getElementById('hp-id').value;
+    const type = document.getElementById('hp-type').value;
+    let config = {};
+    if (type === 'hero') {
+      config = { tag: document.getElementById('hp-hero-tag').value, recipe_id: parseInt(document.getElementById('hp-hero-recipe').value)||null, title_override: document.getElementById('hp-hero-title-override').value, desc_override: document.getElementById('hp-hero-desc-override').value };
+    } else if (type === 'recipes') {
+      config = { mode: document.getElementById('hp-recipes-mode').value, limit: parseInt(document.getElementById('hp-recipes-limit').value)||6, recipe_ids: hpRecipeSlots.map(s=>s.id).filter(Boolean) };
+    } else if (type === 'shop_teaser') {
+      config = { description: document.getElementById('hp-shop-desc').value, product_ids: hpProductSlots.map(s=>s.id).filter(Boolean) };
+    } else if (type === 'spotlight') {
+      config = { description: document.getElementById('hp-spotlight-desc').value, btn_label: document.getElementById('hp-spotlight-btn').value, btn_url: document.getElementById('hp-spotlight-url').value, tiles: hpTiles };
+    } else if (type === 'rich_text') {
+      config = { content: document.getElementById('hp-rich-content').value };
+    }
+    const body = { type, title: document.getElementById('hp-title').value, position: parseInt(document.getElementById('hp-position').value)||99, is_active: document.getElementById('hp-active').checked, config };
+    const res = await fetch(`/api/homepage/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (res.ok) { showToast('Section saved ✓', 'success'); document.getElementById('hp-editor').style.display='none'; loadHomepageSections(); }
+    else showToast('Error saving section', 'error');
+  }
+
+  async function deleteHomepageSection() {
+    const id = document.getElementById('hp-id').value;
+    if (!confirm('Delete this homepage section?')) return;
+    await fetch(`/api/homepage/${id}`, { method:'DELETE' });
+    showToast('Section deleted', 'success');
+    document.getElementById('hp-editor').style.display = 'none';
+    loadHomepageSections();
   }
 
 </script>

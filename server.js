@@ -5,6 +5,7 @@ const path = require('path');
 const { pool } = require('./db/pool');
 
 const menuRoutes = require('./routes/menu');
+const homepageRoutes = require('./routes/homepage');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const commentRoutes = require('./routes/comments');
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/menu', menuRoutes);
+app.use('/api/homepage', homepageRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/comments', commentRoutes);
