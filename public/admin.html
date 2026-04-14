@@ -773,8 +773,8 @@
           <div class="editor-card">
             <div class="editor-card-title">Publishing</div>
             <div style="display:flex;flex-direction:column;gap:12px;">
-              <label class="form-check"><toggle class="toggle-switch"><input type="checkbox" id="art-published" /><span class="toggle-slider"></span></toggle> Published</label>
-              <label class="form-check"><toggle class="toggle-switch"><input type="checkbox" id="art-featured" /><span class="toggle-slider"></span></toggle> Featured</label>
+              <label class="form-check"><input type="checkbox" id="art-published" /> Published</label>
+              <label class="form-check"><input type="checkbox" id="art-featured" /> Featured</label>
             </div>
           </div>
         </div>
@@ -1334,13 +1334,23 @@
       rich_text: { title:'Text block', config:{ content:'' } },
     };
     const d = defaults[type];
-    const res = await fetch('/api/homepage', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ type, title: d.title, position:99, is_active:true, config: d.config })
-    });
-    const data = await res.json();
-    if (res.ok) { showToast('Section added ✓', 'success'); loadHomepageSections(); editHomepageSection(data.section); }
-    else showToast('Error adding section', 'error');
+    try {
+      const res = await fetch('/api/homepage', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ type, title: d.title, position: 99, is_active: true, config: d.config })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        showToast('Section added ✓', 'success');
+        loadHomepageSections();
+        editHomepageSection(data.section);
+      } else {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        showToast('Error: ' + (err.error || res.statusText), 'error');
+      }
+    } catch(e) {
+      showToast('Network error: ' + e.message, 'error');
+    }
   }
 
   function editHomepageSection(s) {
@@ -1571,43 +1581,65 @@
 
   // ── ARTICLES ──
   async function loadArticles() {
-    const res = await fetch('/api/articles/admin/all');
-    const data = await res.json();
     const el = document.getElementById('articles-table-body');
-    if (!data.articles||!data.articles.length) {
-      el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No articles yet. <a href="#" onclick="newArticle()" style="color:var(--accent);">Write your first one →</a></div>';
-      return;
+    try {
+      const res = await fetch('/api/articles/admin/all');
+      if (!res.ok) {
+        el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Error ${res.status}: ${res.statusText}. Make sure you are logged in as admin.</div>`;
+        return;
+      }
+      const data = await res.json();
+      if (!data.articles || !data.articles.length) {
+        el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No articles yet. <a href="#" onclick="newArticle()" style="color:var(--accent);">Write your first one →</a></div>';
+        return;
+      }
+      el.innerHTML = `<table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${
+        data.articles.map(a => `<tr>
+          <td><strong>${a.title}</strong>${a.subtitle ? `<br><span style="font-size:0.78rem;color:var(--muted);">${a.subtitle}</span>` : ''}</td>
+          <td>${a.category||'—'}</td>
+          <td><span class="badge ${a.is_published ? 'badge-green' : 'badge-gray'}">${a.is_published ? 'Published' : 'Draft'}</span>${a.featured ? ' <span class="badge badge-yellow">Featured</span>' : ''}</td>
+          <td style="font-size:0.78rem;color:var(--muted);">${new Date(a.created_at).toLocaleDateString()}</td>
+          <td><div class="td-actions">
+            <button class="btn btn-sm btn-outline" onclick="editArticle(${JSON.stringify(a).replace(/"/g,'&quot;')})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteArticleById(${a.id})">Delete</button>
+          </div></td>
+        </tr>`).join('')
+      }</tbody></table>`;
+    } catch(e) {
+      el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Failed to load: ${e.message}</div>`;
     }
-    el.innerHTML=`<table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${
-      data.articles.map(a=>`<tr>
-        <td><strong>${a.title}</strong>${a.subtitle?`<br><span style="font-size:0.78rem;color:var(--muted);">${a.subtitle}</span>`:''}</td>
-        <td>${a.category||'—'}</td>
-        <td><span class="badge ${a.is_published?'badge-green':'badge-gray'}">${a.is_published?'Published':'Draft'}</span>${a.featured?' <span class="badge badge-yellow">Featured</span>':''}</td>
-        <td style="font-size:0.78rem;color:var(--muted);">${new Date(a.created_at).toLocaleDateString()}</td>
-        <td><div class="td-actions">
-          <button class="btn btn-sm btn-outline" onclick="editArticle(${JSON.stringify(a).replace(/"/g,'&quot;')})">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteArticleById(${a.id})">Delete</button>
-        </div></td>
-      </tr>`).join('')
-    }</tbody></table>`;
   }
 
   function newArticle() {
-    document.getElementById('art-id').value='';
-    document.getElementById('art-title').value=''; document.getElementById('art-subtitle').value='';
-    document.getElementById('art-slug').value=''; document.getElementById('art-category').value='';
-    document.getElementById('art-body').value=''; document.getElementById('art-image-url').value='';
-    document.getElementById('art-img-preview').style.display='none';
-    document.getElementById('art-img-placeholder').style.display='block';
-    document.getElementById('art-published').checked=false; document.getElementById('art-featured').checked=false;
-    document.getElementById('art-delete-btn').style.display='none';
-    document.getElementById('article-editor-title').textContent='New article';
-    document.getElementById('article-editor').style.display='block';
-    document.getElementById('art-preview').innerHTML='';
-    document.getElementById('article-editor').scrollIntoView({behavior:'smooth'});
-    document.getElementById('art-body').addEventListener('input', () => {
-      document.getElementById('art-preview').innerHTML = document.getElementById('art-body').value;
-    });
+    // Clear all fields first
+    const fields = ['art-id','art-title','art-subtitle','art-slug','art-category','art-body','art-image-url'];
+    fields.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const preview = document.getElementById('art-img-preview');
+    const placeholder = document.getElementById('art-img-placeholder');
+    const published = document.getElementById('art-published');
+    const featured = document.getElementById('art-featured');
+    const deleteBtn = document.getElementById('art-delete-btn');
+    const editorTitle = document.getElementById('article-editor-title');
+    const editor = document.getElementById('article-editor');
+    const artPreview = document.getElementById('art-preview');
+
+    if (preview) { preview.style.display = 'none'; preview.src = ''; }
+    if (placeholder) placeholder.style.display = 'block';
+    if (published) published.checked = false;
+    if (featured) featured.checked = false;
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (editorTitle) editorTitle.textContent = 'New article';
+    if (artPreview) artPreview.innerHTML = '';
+    if (editor) {
+      editor.style.display = 'block';
+      setTimeout(() => editor.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+
+    // Wire up live preview
+    const bodyEl = document.getElementById('art-body');
+    if (bodyEl) {
+      bodyEl.oninput = () => { if (artPreview) artPreview.innerHTML = bodyEl.value; };
+    }
   }
 
   function editArticle(a) {
@@ -1700,17 +1732,27 @@
       slug: document.getElementById('art-slug').value,
       subtitle: document.getElementById('art-subtitle').value,
       body: document.getElementById('art-body').value,
-      image_url: document.getElementById('art-image-url').value||null,
+      image_url: document.getElementById('art-image-url').value || null,
       category: document.getElementById('art-category').value,
       is_published: document.getElementById('art-published').checked,
       featured: document.getElementById('art-featured').checked,
     };
-    if (!body.title||!body.slug) { showToast('Title and slug are required','error'); return; }
+    if (!body.title || !body.slug) { showToast('Title and slug are required', 'error'); return; }
     const url = id ? `/api/articles/${id}` : '/api/articles';
     const method = id ? 'PUT' : 'POST';
-    const res = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-    if (res.ok) { showToast('Article saved ✓','success'); document.getElementById('article-editor').style.display='none'; loadArticles(); }
-    else showToast('Error saving article','error');
+    try {
+      const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      if (res.ok) {
+        showToast('Article saved ✓', 'success');
+        document.getElementById('article-editor').style.display = 'none';
+        loadArticles();
+      } else {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        showToast('Error: ' + (err.error || res.statusText), 'error');
+      }
+    } catch(e) {
+      showToast('Network error: ' + e.message, 'error');
+    }
   }
 
   async function deleteArticle() {
