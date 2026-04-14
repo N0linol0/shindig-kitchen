@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shindig Kitchen — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F8F7F4; --surface: #F0EEE9; --ink: #1A1A18; --muted: #9A9288;
+      --accent: #4A6741; --accent-dark: #2C3B28; --danger: #C0392B;
+      --border: rgba(26,26,24,0.08);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    body { background: var(--bg); font-family: var(--font-body); color: var(--ink); }
+    .page { display: none; } .page.active { display: block; }
+
+    /* LOGIN */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: white; border-radius: 12px; padding: 2.5rem; width: 360px; box-shadow: 0 4px 32px rgba(26,26,24,0.08); }
+    .login-logo { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .login-logo em { color: var(--accent); font-style: italic; }
+    .login-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 2rem; }
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .field input { width: 100%; font-family: var(--font-body); font-size: 0.9rem; color: var(--ink); background: var(--bg); border: none; border-radius: 6px; padding: 10px 14px; outline: none; transition: box-shadow 0.2s; }
+    .field input:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.25); }
+    .btn { font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; border: none; border-radius: 4px; padding: 10px 20px; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: white; width: 100%; padding: 11px; }
+    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-sm { padding: 6px 14px; font-size: 0.78rem; }
+    .btn-outline { background: none; border: 1px solid var(--border); color: var(--ink); }
+    .btn-outline:hover { background: var(--surface); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #A93226; }
+    .btn-green { background: var(--accent); color: white; }
+    .btn-green:hover { background: var(--accent-dark); }
+    .error-msg { font-size: 0.82rem; color: var(--danger); margin-top: 0.75rem; text-align: center; }
+
+    /* ADMIN LAYOUT */
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { background: var(--accent-dark); padding: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .sidebar-logo { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: white; padding: 1.75rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-logo em { color: #A8C9A0; font-style: italic; }
+    .sidebar-nav { flex: 1; padding: 1rem 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.7rem 1.5rem; font-size: 0.83rem; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s; border-left: 2px solid transparent; }
+    .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: white; background: rgba(255,255,255,0.08); border-left-color: #A8C9A0; }
+    .nav-item-icon { font-size: 15px; width: 18px; text-align: center; }
+    .sidebar-footer { padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-user { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .btn-logout { font-family: var(--font-body); font-size: 0.78rem; background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); padding: 6px 14px; border-radius: 4px; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .btn-logout:hover { background: rgba(255,255,255,0.08); color: white; }
+
+    /* MAIN CONTENT */
+    .admin-main { padding: 2.5rem; overflow-y: auto; }
+    .admin-section { display: none; } .admin-section.active { display: block; }
+    .page-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .page-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
+    .stat-card { background: white; border-radius: 10px; padding: 1.25rem 1.5rem; }
+    .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .stat-value { font-size: 1.9rem; font-weight: 500; font-family: var(--font-display); }
+    .stat-value.green { color: var(--accent); }
+
+    /* TABLE */
+    .table-wrap { background: white; border-radius: 10px; overflow: hidden; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .table-title { font-size: 0.95rem; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; padding: 0.75rem 1.5rem; text-align: left; border-bottom: 1px solid var(--border); background: var(--bg); }
+    td { font-size: 0.85rem; padding: 0.875rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAF8; }
+    .badge { display: inline-block; font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+    .badge-green { background: #E8F5E4; color: #2E7D32; }
+    .badge-yellow { background: #FFF8E1; color: #F57F17; }
+    .badge-red { background: #FFEBEE; color: #C62828; }
+    .badge-gray { background: var(--surface); color: var(--muted); }
+    .td-actions { display: flex; gap: 6px; }
+
+    /* RECIPE EDITOR */
+    .editor-grid { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; }
+    .editor-card { background: white; border-radius: 10px; padding: 1.75rem; margin-bottom: 1.5rem; }
+    .editor-card-title { font-size: 0.85rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .form-field { margin-bottom: 1rem; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .form-input { width: 100%; font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: var(--bg); border: none; border-radius: 6px; padding: 9px 13px; outline: none; transition: box-shadow 0.2s; }
+    .form-input:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.2); }
+    .form-textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+    .form-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239A9288' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .form-check { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; cursor: pointer; }
+    .form-check input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+    .checks-row { display: flex; gap: 1.5rem; margin-bottom: 1rem; }
+
+    /* INGREDIENT / STEP BUILDER */
+    .ing-list, .step-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .ing-row-editor { display: grid; grid-template-columns: 1fr 80px 80px 32px; gap: 8px; align-items: center; }
+    .step-row-editor { display: grid; grid-template-columns: 24px 1fr 32px; gap: 8px; align-items: start; }
+    .step-num-badge { width: 24px; height: 24px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--muted); font-weight: 500; flex-shrink: 0; margin-top: 8px; }
+    .btn-remove { width: 28px; height: 28px; border-radius: 50%; background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin-top: 6px; }
+    .btn-remove:hover { background: #FFEBEE; border-color: #FFCDD2; color: var(--danger); }
+    .btn-add { font-family: var(--font-body); font-size: 0.8rem; background: none; border: 1px dashed rgba(74,103,65,0.3); color: var(--accent); padding: 7px 14px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.2s; }
+    .btn-add:hover { background: rgba(74,103,65,0.05); border-color: var(--accent); }
+
+    /* IMAGE UPLOAD */
+    .img-upload-area { border: 2px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .img-upload-area:hover { border-color: var(--accent); background: rgba(74,103,65,0.03); }
+    .img-upload-area.has-image { padding: 0; border: none; }
+    .img-preview { width: 100%; border-radius: 8px; object-fit: cover; max-height: 200px; display: block; }
+    .img-upload-label { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+
+    /* TOGGLE */
+    .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 22px; transition: 0.2s; }
+    .toggle-slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+    input:checked + .toggle-slider { background: var(--accent); }
+    input:checked + .toggle-slider:before { transform: translateX(18px); }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--ink); color: white; font-size: 0.82rem; padding: 9px 18px; border-radius: 4px; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 999; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--accent); }
+    .toast.error { background: var(--danger); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" class="page active">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">Shindig<em>Kitchen</em></div>
+      <div class="login-sub">Admin dashboard</div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="your@email.com" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign in</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="page-admin" class="page">
+  <div class="admin-layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">Shindig<em>Kitchen</em></div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" onclick="showSection('dashboard')">
+          <span class="nav-item-icon">◈</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showSection('recipes')">
+          <span class="nav-item-icon">✦</span> Recipes
+        </div>
+        <div class="nav-item" onclick="showSection('recipe-editor')">
+          <span class="nav-item-icon">＋</span> New Recipe
+        </div>
+        <div class="nav-item" onclick="showSection('products')">
+          <span class="nav-item-icon">🫙</span> Shop Products
+        </div>
+        <div class="nav-item" onclick="showSection('orders')">
+          <span class="nav-item-icon">📦</span> Orders
+        </div>
+        <div class="nav-item" onclick="showSection('comments')">
+          <span class="nav-item-icon">💬</span> Comments
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebar-user">—</div>
+        <button class="btn-logout" onclick="doLogout()">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div id="section-dashboard" class="admin-section active">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Welcome back. Here's what's happening.</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Published recipes</div><div class="stat-value green" id="stat-recipes">—</div></div>
+          <div class="stat-card"><div class="stat-label">Registered users</div><div class="stat-value" id="stat-users">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total orders</div><div class="stat-value" id="stat-orders">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total revenue</div><div class="stat-value green" id="stat-revenue">—</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Pending comments</div>
+            <button class="btn btn-sm btn-outline" onclick="showSection('comments')">View all</button>
+          </div>
+          <div id="dashboard-comments"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- RECIPES LIST -->
+      <div id="section-recipes" class="admin-section">
+        <div class="page-title">Recipes</div>
+        <div class="page-sub">Manage your published and draft recipes.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">All recipes</div>
+            <button class="btn btn-sm btn-green" onclick="newRecipe()">+ New recipe</button>
+          </div>
+          <div id="recipes-table-body">
+            <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECIPE EDITOR -->
+      <div id="section-recipe-editor" class="admin-section">
+        <div class="page-title" id="editor-title">New recipe</div>
+        <div class="page-sub">Fill in the details below. All fields marked with * are required.</div>
+        <input type="hidden" id="edit-recipe-id" value="" />
+        <div class="editor-grid">
+          <div>
+            <div class="editor-card">
+              <div class="editor-card-title">Basic info</div>
+              <div class="form-field">
+                <label class="form-label">Title *</label>
+                <input class="form-input" id="r-title" placeholder="e.g. Strawberry Balsamic Jam" oninput="autoSlug()" />
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Slug *</label>
+                  <input class="form-input" id="r-slug" placeholder="strawberry-balsamic-jam" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Category</label>
+                  <select class="form-input form-select" id="r-category">
+                    <option value="">Select category</option>
+                    <option value="1">Canning & Preserving</option>
+                    <option value="2">Sauces & Condiments</option>
+                    <option value="3">Mains</option>
+                    <option value="4">Baking</option>
+                    <option value="5">Seasonal</option>
+                    <option value="6">Pickles & Ferments</option>
+                    <option value="7">Desserts</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Description *</label>
+                <textarea class="form-input form-textarea" id="r-description" placeholder="A short, enticing description of the recipe..."></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Prep time (minutes)</label>
+                  <input class="form-input" type="number" id="r-prep" placeholder="15" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Cook time (minutes)</label>
+                  <input class="form-input" type="number" id="r-cook" placeholder="45" />
+                </div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Base servings</label>
+                <input class="form-input" type="number" id="r-servings" placeholder="4" value="4" />
+              </div>
+            </div>
+
+            <div class="editor-card">
+              <div class="editor-card-title">Ingredients</div>
+              <div style="display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;margin-bottom:6px;">
+                <span style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Name</span>
+                <span style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Amount</span>
+                <span style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Unit</span>
+                <span></span>
+              </div>
+              <div class="ing-list" id="ing-list"></div>
+              <button class="btn-add" onclick="addIngredient()">+ Add ingredient</button>
+            </div>
+
+            <div class="editor-card">
+              <div class="editor-card-title">Method steps</div>
+              <div class="step-list" id="step-list"></div>
+              <button class="btn-add" onclick="addStep()">+ Add step</button>
+            </div>
+
+            <div class="editor-card">
+              <div class="editor-card-title">Cook's notes</div>
+              <textarea class="form-input form-textarea" id="r-notes" placeholder="Optional tips, substitutions, make-ahead advice..."></textarea>
+            </div>
+          </div>
+
+          <div>
+            <div class="editor-card">
+              <div class="editor-card-title">Photo</div>
+              <div class="img-upload-area" id="img-upload-area" onclick="document.getElementById('img-file').click()">
+                <div id="img-placeholder">
+                  <div style="font-size:2rem;margin-bottom:8px;">📷</div>
+                  <div class="img-upload-label">Click to upload photo</div>
+                  <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">JPG, PNG up to 10MB</div>
+                </div>
+                <img id="img-preview-el" class="img-preview" style="display:none;" />
+              </div>
+              <input type="file" id="img-file" accept="image/*" style="display:none;" onchange="handleImageUpload(this)" />
+              <input type="hidden" id="r-image-url" />
+              <button class="btn btn-sm btn-outline" style="width:100%;margin-top:10px;" onclick="document.getElementById('img-file').click()">Change photo</button>
+            </div>
+
+            <div class="editor-card">
+              <div class="editor-card-title">Publishing</div>
+              <div class="checks-row" style="flex-direction:column;gap:12px;">
+                <label class="form-check">
+                  <toggle class="toggle-switch"><input type="checkbox" id="r-published" /><span class="toggle-slider"></span></toggle>
+                  Published
+                </label>
+                <label class="form-check">
+                  <toggle class="toggle-switch"><input type="checkbox" id="r-featured" /><span class="toggle-slider"></span></toggle>
+                  Featured on homepage
+                </label>
+                <label class="form-check">
+                  <toggle class="toggle-switch"><input type="checkbox" id="r-vegan" /><span class="toggle-slider"></span></toggle>
+                  Vegan
+                </label>
+              </div>
+            </div>
+
+            <div class="editor-card">
+              <div class="editor-card-title">Actions</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button class="btn btn-primary" onclick="saveRecipe()">Save recipe</button>
+                <button class="btn btn-sm btn-outline" onclick="showSection('recipes')">Cancel</button>
+                <button class="btn btn-sm btn-danger" id="delete-recipe-btn" style="display:none;" onclick="deleteRecipe()">Delete recipe</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="section-products" class="admin-section">
+        <div class="page-title">Shop products</div>
+        <div class="page-sub">Manage your products, prices and stock levels.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">All products</div>
+            <button class="btn btn-sm btn-green" onclick="showProductForm()">+ New product</button>
+          </div>
+          <div id="products-table-body">
+            <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div>
+          </div>
+        </div>
+        <div id="product-form" style="display:none;margin-top:1.5rem;">
+          <div class="editor-card">
+            <div class="editor-card-title" id="product-form-title">New product</div>
+            <input type="hidden" id="p-id" />
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Product name *</label>
+                <input class="form-input" id="p-name" placeholder="Strawberry Balsamic Jam" oninput="autoPSlug()" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Slug *</label>
+                <input class="form-input" id="p-slug" placeholder="strawberry-balsamic-jam" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Price ($) *</label>
+                <input class="form-input" type="number" step="0.01" id="p-price" placeholder="12.00" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Stock quantity</label>
+                <input class="form-input" type="number" id="p-stock" placeholder="0" />
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Description</label>
+              <textarea class="form-input form-textarea" id="p-desc" placeholder="Short product description..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <button class="btn btn-primary btn-sm" onclick="saveProduct()">Save product</button>
+              <button class="btn btn-sm btn-outline" onclick="document.getElementById('product-form').style.display='none'">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="section-orders" class="admin-section">
+        <div class="page-title">Orders</div>
+        <div class="page-sub">View and manage customer orders.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">All orders</div>
+            <select class="form-input form-select" style="width:160px;" onchange="loadOrders(this.value)">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="fulfilled">Fulfilled</option>
+            </select>
+          </div>
+          <div id="orders-table-body">
+            <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMMENTS -->
+      <div id="section-comments" class="admin-section">
+        <div class="page-title">Comments</div>
+        <div class="page-sub">Review and moderate reader comments.</div>
+        <div class="table-wrap">
+          <div class="table-header"><div class="table-title">All comments</div></div>
+          <div id="comments-table-body">
+            <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let currentUser = null;
+  let ingredients = [];
+  let steps = [];
+
+  // AUTH
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    document.getElementById('login-error').textContent = '';
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('login-error').textContent = data.error; return; }
+      if (data.user.role !== 'admin') { document.getElementById('login-error').textContent = 'Access denied.'; return; }
+      currentUser = data.user;
+      showAdmin();
+    } catch (e) { document.getElementById('login-error').textContent = 'Connection error.'; }
+  }
+
+  async function doLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    document.getElementById('page-admin').classList.remove('active');
+    document.getElementById('page-login').classList.add('active');
+    currentUser = null;
+  }
+
+  async function checkSession() {
+    const res = await fetch('/api/auth/me');
+    const data = await res.json();
+    if (data.user && data.user.role === 'admin') { currentUser = data.user; showAdmin(); }
+  }
+
+  function showAdmin() {
+    document.getElementById('page-login').classList.remove('active');
+    document.getElementById('page-admin').classList.add('active');
+    document.getElementById('sidebar-user').textContent = currentUser.username;
+    loadDashboard();
+  }
+
+  // NAVIGATION
+  function showSection(name) {
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    const navMap = { dashboard: 0, recipes: 1, 'recipe-editor': 2, products: 3, orders: 4, comments: 5 };
+    const items = document.querySelectorAll('.nav-item');
+    if (navMap[name] !== undefined) items[navMap[name]].classList.add('active');
+    if (name === 'recipes') loadRecipes();
+    if (name === 'orders') loadOrders();
+    if (name === 'products') loadProducts();
+    if (name === 'comments') loadComments();
+  }
+
+  // DASHBOARD
+  async function loadDashboard() {
+    try {
+      const res = await fetch('/api/admin/stats');
+      const data = await res.json();
+      document.getElementById('stat-recipes').textContent = data.recipes;
+      document.getElementById('stat-users').textContent = data.users;
+      document.getElementById('stat-orders').textContent = data.orders;
+      document.getElementById('stat-revenue').textContent = '$' + parseFloat(data.revenue).toFixed(2);
+    } catch (e) {}
+    loadDashboardComments();
+  }
+
+  async function loadDashboardComments() {
+    const res = await fetch('/api/admin/comments');
+    const data = await res.json();
+    const pending = (data.comments || []).filter(c => !c.is_approved).slice(0, 5);
+    const el = document.getElementById('dashboard-comments');
+    if (!pending.length) { el.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.85rem;">No pending comments</div>'; return; }
+    el.innerHTML = `<table><thead><tr><th>Author</th><th>Recipe</th><th>Comment</th><th>Action</th></tr></thead><tbody>${
+      pending.map(c => `<tr><td>${c.username}</td><td>${c.recipe_title}</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.body}</td><td><div class="td-actions"><button class="btn btn-sm btn-green" onclick="approveComment(${c.id})">Approve</button><button class="btn btn-sm btn-danger" onclick="deleteComment(${c.id})">Delete</button></div></td></tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  // RECIPES
+  async function loadRecipes() {
+    const res = await fetch('/api/admin/recipes');
+    const data = await res.json();
+    const el = document.getElementById('recipes-table-body');
+    if (!data.recipes || !data.recipes.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No recipes yet. <a href="#" onclick="newRecipe()" style="color:var(--accent);">Add your first one →</a></div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Likes</th><th>Actions</th></tr></thead><tbody>${
+      data.recipes.map(r => `<tr>
+        <td><strong>${r.title}</strong></td>
+        <td>${r.category_name || '—'}</td>
+        <td><span class="badge ${r.is_published ? 'badge-green' : 'badge-gray'}">${r.is_published ? 'Published' : 'Draft'}</span>${r.featured ? ' <span class="badge badge-yellow">Featured</span>' : ''}</td>
+        <td>${r.like_count}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-sm btn-outline" onclick="editRecipe(${JSON.stringify(r).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRecipeById(${r.id})">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function newRecipe() {
+    document.getElementById('edit-recipe-id').value = '';
+    document.getElementById('editor-title').textContent = 'New recipe';
+    document.getElementById('delete-recipe-btn').style.display = 'none';
+    document.getElementById('r-title').value = '';
+    document.getElementById('r-slug').value = '';
+    document.getElementById('r-description').value = '';
+    document.getElementById('r-category').value = '';
+    document.getElementById('r-prep').value = '';
+    document.getElementById('r-cook').value = '';
+    document.getElementById('r-servings').value = '4';
+    document.getElementById('r-notes').value = '';
+    document.getElementById('r-published').checked = false;
+    document.getElementById('r-featured').checked = false;
+    document.getElementById('r-vegan').checked = false;
+    document.getElementById('r-image-url').value = '';
+    document.getElementById('img-preview-el').style.display = 'none';
+    document.getElementById('img-placeholder').style.display = 'block';
+    ingredients = [];
+    steps = [];
+    renderIngredients();
+    renderSteps();
+    showSection('recipe-editor');
+  }
+
+  function editRecipe(r) {
+    document.getElementById('edit-recipe-id').value = r.id;
+    document.getElementById('editor-title').textContent = 'Edit recipe';
+    document.getElementById('delete-recipe-btn').style.display = 'block';
+    document.getElementById('r-title').value = r.title;
+    document.getElementById('r-slug').value = r.slug;
+    document.getElementById('r-description').value = r.description || '';
+    document.getElementById('r-category').value = r.category_id || '';
+    document.getElementById('r-prep').value = r.prep_time || '';
+    document.getElementById('r-cook').value = r.cook_time || '';
+    document.getElementById('r-servings').value = r.base_servings || 4;
+    document.getElementById('r-notes').value = r.notes || '';
+    document.getElementById('r-published').checked = r.is_published;
+    document.getElementById('r-featured').checked = r.featured;
+    document.getElementById('r-vegan').checked = r.is_vegan;
+    document.getElementById('r-image-url').value = r.image_url || '';
+    if (r.image_url) {
+      document.getElementById('img-preview-el').src = r.image_url;
+      document.getElementById('img-preview-el').style.display = 'block';
+      document.getElementById('img-placeholder').style.display = 'none';
+    }
+    ingredients = Array.isArray(r.ingredients) ? r.ingredients : JSON.parse(r.ingredients || '[]');
+    steps = Array.isArray(r.steps) ? r.steps : JSON.parse(r.steps || '[]');
+    renderIngredients();
+    renderSteps();
+    showSection('recipe-editor');
+  }
+
+  function autoSlug() {
+    const title = document.getElementById('r-title').value;
+    document.getElementById('r-slug').value = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  function addIngredient() {
+    ingredients.push({ name: '', amount: '', unit: '' });
+    renderIngredients();
+  }
+
+  function removeIngredient(i) { ingredients.splice(i, 1); renderIngredients(); }
+
+  function renderIngredients() {
+    const list = document.getElementById('ing-list');
+    list.innerHTML = ingredients.map((ing, i) => `
+      <div class="ing-row-editor">
+        <input class="form-input" placeholder="e.g. Baby Yukon Gold potatoes" value="${ing.name}" oninput="ingredients[${i}].name=this.value" />
+        <input class="form-input" placeholder="400" value="${ing.amount}" oninput="ingredients[${i}].amount=this.value" />
+        <input class="form-input" placeholder="g" value="${ing.unit}" oninput="ingredients[${i}].unit=this.value" />
+        <button class="btn-remove" onclick="removeIngredient(${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  function addStep() {
+    steps.push({ title: '', text: '' });
+    renderSteps();
+  }
+
+  function removeStep(i) { steps.splice(i, 1); renderSteps(); }
+
+  function renderSteps() {
+    const list = document.getElementById('step-list');
+    list.innerHTML = steps.map((step, i) => `
+      <div class="step-row-editor">
+        <div class="step-num-badge">${i + 1}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+          <input class="form-input" placeholder="Step title (e.g. Boil the potatoes)" value="${step.title}" oninput="steps[${i}].title=this.value" />
+          <textarea class="form-input form-textarea" placeholder="Step instructions..." oninput="steps[${i}].text=this.value" style="min-height:70px;">${step.text}</textarea>
+        </div>
+        <button class="btn-remove" onclick="removeStep(${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  async function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    showToast('Uploading image...');
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.url) {
+        document.getElementById('r-image-url').value = data.url;
+        document.getElementById('img-preview-el').src = data.url;
+        document.getElementById('img-preview-el').style.display = 'block';
+        document.getElementById('img-placeholder').style.display = 'none';
+        showToast('Image uploaded ✓', 'success');
+      }
+    } catch (e) { showToast('Upload failed', 'error'); }
+  }
+
+  async function saveRecipe() {
+    const id = document.getElementById('edit-recipe-id').value;
+    const body = {
+      title: document.getElementById('r-title').value,
+      slug: document.getElementById('r-slug').value,
+      description: document.getElementById('r-description').value,
+      category_id: document.getElementById('r-category').value || null,
+      prep_time: parseInt(document.getElementById('r-prep').value) || null,
+      cook_time: parseInt(document.getElementById('r-cook').value) || null,
+      base_servings: parseInt(document.getElementById('r-servings').value) || 4,
+      ingredients,
+      steps,
+      notes: document.getElementById('r-notes').value,
+      is_vegan: document.getElementById('r-vegan').checked,
+      is_published: document.getElementById('r-published').checked,
+      featured: document.getElementById('r-featured').checked,
+      image_url: document.getElementById('r-image-url').value || null,
+    };
+    if (!body.title || !body.slug) { showToast('Title and slug are required', 'error'); return; }
+    try {
+      const url = id ? `/api/admin/recipes/${id}` : '/api/admin/recipes';
+      const method = id ? 'PUT' : 'POST';
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || 'Error saving recipe', 'error'); return; }
+      showToast('Recipe saved ✓', 'success');
+      setTimeout(() => showSection('recipes'), 800);
+    } catch (e) { showToast('Connection error', 'error'); }
+  }
+
+  async function deleteRecipe() {
+    const id = document.getElementById('edit-recipe-id').value;
+    if (!id || !confirm('Delete this recipe? This cannot be undone.')) return;
+    await deleteRecipeById(id);
+  }
+
+  async function deleteRecipeById(id) {
+    if (!confirm('Delete this recipe? This cannot be undone.')) return;
+    await fetch(`/api/admin/recipes/${id}`, { method: 'DELETE' });
+    showToast('Recipe deleted', 'success');
+    showSection('recipes');
+  }
+
+  // PRODUCTS
+  async function loadProducts() {
+    const res = await fetch('/api/admin/products');
+    const data = await res.json();
+    const el = document.getElementById('products-table-body');
+    if (!data.products || !data.products.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No products yet.</div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+      data.products.map(p => `<tr>
+        <td><strong>${p.name}</strong></td>
+        <td>$${parseFloat(p.price).toFixed(2)}</td>
+        <td>${p.stock}</td>
+        <td><span class="badge ${p.is_active ? 'badge-green' : 'badge-gray'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-sm btn-outline" onclick="editProduct(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function showProductForm() {
+    document.getElementById('p-id').value = '';
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-slug').value = '';
+    document.getElementById('p-price').value = '';
+    document.getElementById('p-stock').value = '';
+    document.getElementById('p-desc').value = '';
+    document.getElementById('product-form-title').textContent = 'New product';
+    document.getElementById('product-form').style.display = 'block';
+    document.getElementById('product-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function editProduct(p) {
+    document.getElementById('p-id').value = p.id;
+    document.getElementById('p-name').value = p.name;
+    document.getElementById('p-slug').value = p.slug;
+    document.getElementById('p-price').value = p.price;
+    document.getElementById('p-stock').value = p.stock;
+    document.getElementById('p-desc').value = p.description || '';
+    document.getElementById('product-form-title').textContent = 'Edit product';
+    document.getElementById('product-form').style.display = 'block';
+    document.getElementById('product-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function autoPSlug() {
+    const name = document.getElementById('p-name').value;
+    document.getElementById('p-slug').value = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  async function saveProduct() {
+    const id = document.getElementById('p-id').value;
+    const body = {
+      name: document.getElementById('p-name').value,
+      slug: document.getElementById('p-slug').value,
+      price: parseFloat(document.getElementById('p-price').value),
+      stock: parseInt(document.getElementById('p-stock').value) || 0,
+      description: document.getElementById('p-desc').value,
+      is_active: true,
+    };
+    if (!body.name || !body.slug || !body.price) { showToast('Name, slug and price are required', 'error'); return; }
+    const url = id ? `/api/admin/products/${id}` : '/api/admin/products';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (res.ok) {
+      showToast('Product saved ✓', 'success');
+      document.getElementById('product-form').style.display = 'none';
+      loadProducts();
+    } else { showToast('Error saving product', 'error'); }
+  }
+
+  // ORDERS
+  async function loadOrders(status = '') {
+    const url = '/api/admin/orders' + (status ? `?status=${status}` : '');
+    const res = await fetch(url);
+    const data = await res.json();
+    const el = document.getElementById('orders-table-body');
+    if (!data.orders || !data.orders.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No orders yet.</div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${
+      data.orders.map(o => `<tr>
+        <td>#${o.id}</td>
+        <td>${o.shipping_name || o.email}</td>
+        <td>$${parseFloat(o.total).toFixed(2)}</td>
+        <td><span class="badge ${o.status==='fulfilled'?'badge-green':o.status==='shipped'?'badge-yellow':'badge-gray'}">${o.status}</span></td>
+        <td>${new Date(o.created_at).toLocaleDateString()}</td>
+        <td><div class="td-actions">
+          <select class="form-input form-select" style="padding:5px 28px 5px 8px;font-size:0.78rem;" onchange="updateOrderStatus(${o.id}, this.value)">
+            <option ${o.status==='pending'?'selected':''}>pending</option>
+            <option ${o.status==='processing'?'selected':''}>processing</option>
+            <option ${o.status==='shipped'?'selected':''}>shipped</option>
+            <option ${o.status==='fulfilled'?'selected':''}>fulfilled</option>
+          </select>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  async function updateOrderStatus(id, status) {
+    await fetch(`/api/admin/orders/${id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    showToast('Order updated ✓', 'success');
+  }
+
+  // COMMENTS
+  async function loadComments() {
+    const res = await fetch('/api/admin/comments');
+    const data = await res.json();
+    const el = document.getElementById('comments-table-body');
+    if (!data.comments || !data.comments.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No comments yet.</div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Author</th><th>Recipe</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+      data.comments.map(c => `<tr>
+        <td>${c.username}</td>
+        <td><a href="/recipe/${c.recipe_slug}" style="color:var(--accent);font-size:0.82rem;">${c.recipe_title}</a></td>
+        <td style="max-width:280px;font-size:0.83rem;color:var(--muted);">${c.body.substring(0, 100)}${c.body.length > 100 ? '...' : ''}</td>
+        <td><span class="badge ${c.is_approved ? 'badge-green' : 'badge-yellow'}">${c.is_approved ? 'Approved' : 'Pending'}</span></td>
+        <td><div class="td-actions">
+          ${!c.is_approved ? `<button class="btn btn-sm btn-green" onclick="approveComment(${c.id})">Approve</button>` : ''}
+          <button class="btn btn-sm btn-danger" onclick="deleteComment(${c.id})">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  async function approveComment(id) {
+    await fetch(`/api/admin/comments/${id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_approved: true })
+    });
+    showToast('Comment approved ✓', 'success');
+    loadComments();
+    loadDashboardComments();
+  }
+
+  async function deleteComment(id) {
+    if (!confirm('Delete this comment?')) return;
+    await fetch(`/api/admin/comments/${id}`, { method: 'DELETE' });
+    showToast('Comment deleted', 'success');
+    loadComments();
+  }
+
+  // TOAST
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast' + (type ? ' ' + type : '');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  checkSession();
+</script>
+
+</body>
+</html>

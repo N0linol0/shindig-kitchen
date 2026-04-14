@@ -163,4 +163,13 @@ router.put('/comments/:id', async (req, res) => {
   }
 });
 
+router.delete('/comments/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM comments WHERE id=$1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
