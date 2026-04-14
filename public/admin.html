@@ -787,7 +787,7 @@
       <!-- USERS -->
       <div id="section-users" class="admin-section">
         <div class="page-title">Users</div>
-        <div class="page-sub">All registered accounts. You can promote to admin, suspend, reset passwords, or delete users.</div>
+        <div class="page-sub">All registered accounts. Click Edit to manage a user's role, status, password, or to delete them.</div>
         <div class="table-wrap">
           <div class="table-header">
             <div class="table-title" id="users-count">All users</div>
@@ -795,16 +795,76 @@
           <div id="users-table-body"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
         </div>
 
-        <!-- Reset password result modal -->
-        <div id="pw-result" style="display:none;margin-top:1.5rem;">
-          <div class="editor-card" style="background:#F0FFF4;border:1px solid #A8C9A0;">
-            <div class="editor-card-title" style="color:var(--accent);">Temporary password generated</div>
-            <p style="font-size:0.9rem;margin-bottom:12px;">Send this to the user — they should change it immediately after logging in.</p>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <code id="pw-result-value" style="background:white;padding:8px 14px;border-radius:4px;font-size:1.1rem;letter-spacing:0.05em;border:1px solid var(--border);"></code>
-              <button class="btn btn-sm btn-outline" onclick="copyTempPw()">Copy</button>
+        <!-- USER EDIT PANEL -->
+        <div id="user-edit-panel" style="display:none;margin-top:1.5rem;">
+          <div class="editor-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+              <div>
+                <div class="editor-card-title" id="user-panel-name" style="margin-bottom:2px;">Edit user</div>
+                <div id="user-panel-email" style="font-size:0.82rem;color:var(--muted);"></div>
+              </div>
+              <button class="btn btn-sm btn-outline" onclick="closeUserPanel()">Close</button>
             </div>
-            <button class="btn btn-sm btn-outline" style="margin-top:12px;" onclick="document.getElementById('pw-result').style.display='none'">Dismiss</button>
+
+            <input type="hidden" id="up-id" />
+
+            <!-- Role -->
+            <div style="padding:1.25rem 0;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                  <div style="font-size:0.85rem;font-weight:500;margin-bottom:3px;">Role</div>
+                  <div style="font-size:0.82rem;color:var(--muted);">Admin users have full access to this admin panel.</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-sm btn-outline" id="up-make-admin-btn" onclick="upSetRole('admin')">Make admin</button>
+                  <button class="btn btn-sm btn-outline" id="up-remove-admin-btn" onclick="upSetRole('user')" style="display:none;">Remove admin</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div style="padding:1.25rem 0;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                  <div style="font-size:0.85rem;font-weight:500;margin-bottom:3px;">Account status</div>
+                  <div style="font-size:0.82rem;color:var(--muted);">Suspended users cannot log in.</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-sm btn-outline" id="up-suspend-btn" onclick="upSetSuspend(true)">Suspend account</button>
+                  <button class="btn btn-sm btn-outline" id="up-unsuspend-btn" onclick="upSetSuspend(false)" style="display:none;">Unsuspend account</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reset password -->
+            <div style="padding:1.25rem 0;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                  <div style="font-size:0.85rem;font-weight:500;margin-bottom:3px;">Reset password</div>
+                  <div style="font-size:0.82rem;color:var(--muted);">Generates a temporary password you can send to the user.</div>
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="upResetPassword()">Reset password</button>
+              </div>
+              <div id="up-pw-result" style="display:none;margin-top:1rem;background:#F0FFF4;border:1px solid #A8C9A0;border-radius:6px;padding:12px 16px;">
+                <div style="font-size:0.8rem;color:var(--accent);margin-bottom:8px;font-weight:500;">Temporary password — send this to the user:</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <code id="up-pw-value" style="background:white;padding:7px 14px;border-radius:4px;font-size:1.05rem;letter-spacing:0.08em;border:1px solid var(--border);"></code>
+                  <button class="btn btn-sm btn-outline" onclick="upCopyPw()">Copy</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete -->
+            <div style="padding:1.25rem 0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                  <div style="font-size:0.85rem;font-weight:500;margin-bottom:3px;color:#C62828;">Delete account</div>
+                  <div style="font-size:0.82rem;color:var(--muted);">Permanently deletes this user and all their comments and likes.</div>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="upDelete()">Delete account</button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1799,8 +1859,11 @@
   }
 
   // ── USERS ──
+  let _currentUser = null;
+
   async function loadUsers() {
     const el = document.getElementById('users-table-body');
+    closeUserPanel();
     try {
       const res = await fetch('/api/admin/users');
       if (!res.ok) {
@@ -1818,31 +1881,19 @@
       el.innerHTML = `<table>
         <thead><tr>
           <th>User</th><th>Email</th><th>Role</th>
-          <th>Comments</th><th>Likes</th><th>Joined</th><th>Status</th><th>Actions</th>
+          <th>Comments</th><th>Joined</th><th>Status</th><th></th>
         </tr></thead>
-        <tbody>${users.map(u => `<tr>
+        <tbody>${users.map(u => `<tr id="user-row-${u.id}">
           <td>
             <strong>${u.display_name || u.username}</strong>
             <br><span style="font-size:0.78rem;color:var(--muted);">@${u.username}</span>
           </td>
           <td style="font-size:0.82rem;">${u.email}</td>
-          <td><span class="badge ${u.role === 'admin' ? 'badge-green' : 'badge-gray'}">${u.role}</span></td>
+          <td><span class="badge ${u.role==='admin'?'badge-green':'badge-gray'}">${u.role}</span></td>
           <td style="text-align:center;color:var(--muted);">${u.comment_count}</td>
-          <td style="text-align:center;color:var(--muted);">${u.likes_count}</td>
           <td style="font-size:0.78rem;color:var(--muted);">${new Date(u.created_at).toLocaleDateString()}</td>
-          <td><span class="badge ${u.is_suspended ? 'badge-red' : 'badge-green'}">${u.is_suspended ? 'Suspended' : 'Active'}</span></td>
-          <td>
-            <div class="td-actions" style="flex-wrap:wrap;gap:4px;">
-              ${u.role === 'admin'
-                ? `<button class="btn btn-sm btn-outline" onclick="setUserRole(${u.id},'user')">Remove admin</button>`
-                : `<button class="btn btn-sm btn-outline" onclick="setUserRole(${u.id},'admin')">Make admin</button>`}
-              ${u.is_suspended
-                ? `<button class="btn btn-sm btn-outline" onclick="setSuspend(${u.id},false)">Unsuspend</button>`
-                : `<button class="btn btn-sm btn-outline" onclick="setSuspend(${u.id},true)">Suspend</button>`}
-              <button class="btn btn-sm btn-outline" onclick="resetPassword(${u.id})">Reset pw</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id},'${(u.display_name||u.username).replace(/'/g,'&#39;')}')">Delete</button>
-            </div>
-          </td>
+          <td><span class="badge ${u.is_suspended?'badge-red':'badge-green'}">${u.is_suspended?'Suspended':'Active'}</span></td>
+          <td><button class="btn btn-sm btn-outline" onclick="openUserPanel(${JSON.stringify(u).replace(/"/g,'&quot;')})">Edit</button></td>
         </tr>`).join('')}
         </tbody>
       </table>`;
@@ -1851,46 +1902,88 @@
     }
   }
 
-  async function setUserRole(id, role) {
+  function openUserPanel(u) {
+    _currentUser = u;
+    document.getElementById('up-id').value = u.id;
+    document.getElementById('user-panel-name').textContent = u.display_name || u.username;
+    document.getElementById('user-panel-email').textContent = u.email + ' · @' + u.username;
+    // Role buttons
+    document.getElementById('up-make-admin-btn').style.display = u.role === 'admin' ? 'none' : 'inline-flex';
+    document.getElementById('up-remove-admin-btn').style.display = u.role === 'admin' ? 'inline-flex' : 'none';
+    // Suspend buttons
+    document.getElementById('up-suspend-btn').style.display = u.is_suspended ? 'none' : 'inline-flex';
+    document.getElementById('up-unsuspend-btn').style.display = u.is_suspended ? 'inline-flex' : 'none';
+    // Hide pw result from previous open
+    document.getElementById('up-pw-result').style.display = 'none';
+    document.getElementById('up-pw-value').textContent = '';
+    // Show panel
+    const panel = document.getElementById('user-edit-panel');
+    panel.style.display = 'block';
+    setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+
+  function closeUserPanel() {
+    document.getElementById('user-edit-panel').style.display = 'none';
+    _currentUser = null;
+  }
+
+  async function upSetRole(role) {
+    const id = document.getElementById('up-id').value;
     const res = await fetch(`/api/admin/users/${id}/role`, {
-      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({role})
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ role })
     });
-    const d = await res.json();
-    if (res.ok) { showToast(role==='admin'?'Promoted to admin ✓':'Admin role removed ✓','success'); loadUsers(); }
-    else showToast('Error: '+d.error,'error');
-  }
-
-  async function setSuspend(id, is_suspended) {
-    const res = await fetch(`/api/admin/users/${id}/suspend`, {
-      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({is_suspended})
-    });
-    const d = await res.json();
-    if (res.ok) { showToast(is_suspended?'User suspended':'User unsuspended ✓','success'); loadUsers(); }
-    else showToast('Error: '+d.error,'error');
-  }
-
-  async function resetPassword(id) {
-    if (!confirm('Generate a new temporary password for this user?')) return;
-    const res = await fetch(`/api/admin/users/${id}/reset-password`, {method:'PUT'});
     const d = await res.json();
     if (res.ok) {
-      document.getElementById('pw-result-value').textContent = d.tempPassword;
-      document.getElementById('pw-result').style.display = 'block';
-      document.getElementById('pw-result').scrollIntoView({behavior:'smooth'});
-    } else showToast('Error: '+d.error,'error');
+      showToast(role === 'admin' ? 'Promoted to admin ✓' : 'Admin role removed ✓', 'success');
+      _currentUser.role = role;
+      document.getElementById('up-make-admin-btn').style.display = role === 'admin' ? 'none' : 'inline-flex';
+      document.getElementById('up-remove-admin-btn').style.display = role === 'admin' ? 'inline-flex' : 'none';
+      loadUsers();
+    } else showToast('Error: ' + d.error, 'error');
   }
 
-  function copyTempPw() {
-    const pw = document.getElementById('pw-result-value').textContent;
-    navigator.clipboard.writeText(pw).then(()=>showToast('Copied ✓','success'));
-  }
-
-  async function deleteUser(id, name) {
-    if (!confirm(`Delete user "${name}"?\n\nThis will also remove their comments and likes. Cannot be undone.`)) return;
-    const res = await fetch(`/api/admin/users/${id}`, {method:'DELETE'});
+  async function upSetSuspend(is_suspended) {
+    const id = document.getElementById('up-id').value;
+    const res = await fetch(`/api/admin/users/${id}/suspend`, {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ is_suspended })
+    });
     const d = await res.json();
-    if (res.ok) { showToast('User deleted','success'); loadUsers(); }
-    else showToast('Error: '+d.error,'error');
+    if (res.ok) {
+      showToast(is_suspended ? 'User suspended' : 'User unsuspended ✓', 'success');
+      _currentUser.is_suspended = is_suspended;
+      document.getElementById('up-suspend-btn').style.display = is_suspended ? 'none' : 'inline-flex';
+      document.getElementById('up-unsuspend-btn').style.display = is_suspended ? 'inline-flex' : 'none';
+      loadUsers();
+    } else showToast('Error: ' + d.error, 'error');
+  }
+
+  async function upResetPassword() {
+    const id = document.getElementById('up-id').value;
+    if (!confirm('Generate a new temporary password for this user?')) return;
+    const res = await fetch(`/api/admin/users/${id}/reset-password`, { method: 'PUT' });
+    const d = await res.json();
+    if (res.ok) {
+      document.getElementById('up-pw-value').textContent = d.tempPassword;
+      document.getElementById('up-pw-result').style.display = 'block';
+    } else showToast('Error: ' + d.error, 'error');
+  }
+
+  function upCopyPw() {
+    const pw = document.getElementById('up-pw-value').textContent;
+    navigator.clipboard.writeText(pw).then(() => showToast('Copied ✓', 'success'));
+  }
+
+  async function upDelete() {
+    const id = document.getElementById('up-id').value;
+    const name = document.getElementById('user-panel-name').textContent;
+    if (!confirm(`Delete account "${name}"?\n\nThis will also remove their comments and likes. Cannot be undone.`)) return;
+    const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+    const d = await res.json();
+    if (res.ok) {
+      showToast('Account deleted', 'success');
+      closeUserPanel();
+      loadUsers();
+    } else showToast('Error: ' + d.error, 'error');
   }
 
 </script>
