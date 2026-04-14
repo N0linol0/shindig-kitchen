@@ -175,3 +175,46 @@ INSERT INTO homepage_sections (type, title, position, is_active, config) VALUES
   ('shop_teaser', 'From our kitchen', 3, true, '{"description": "A curated selection of small-batch jams, pickles, and condiments made from the same recipes on this site.", "product_ids": []}'),
   ('spotlight', 'Canning school', 4, true, '{"description": "From water bath basics to pressure canning, we''ve got you covered — step by step, jar by jar.", "tiles": [{"emoji": "🫙", "name": "Water Bath Canning", "count": "12 recipes", "url": "/canning"}, {"emoji": "🧄", "name": "Pickles & Brines", "count": "18 recipes", "url": "/pickles"}, {"emoji": "🍓", "name": "Jams & Jellies", "count": "24 recipes", "url": "/canning"}, {"emoji": "🌶️", "name": "Ferments & Hot Sauces", "count": "9 recipes", "url": "/pickles"}]}')
 ON CONFLICT DO NOTHING;
+
+-- CONTENT STRIP (sub-navigation)
+CREATE TABLE IF NOT EXISTS content_strip_items (
+  id          SERIAL PRIMARY KEY,
+  label       VARCHAR(100) NOT NULL,
+  link_type   VARCHAR(30) DEFAULT 'category',
+  url         VARCHAR(255),
+  category_slug VARCHAR(100),
+  position    INTEGER DEFAULT 99,
+  is_active   BOOLEAN DEFAULT TRUE,
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO content_strip_items (label, link_type, url, category_slug, position) VALUES
+  ('All recipes',          'all',      '/',             '',         1),
+  ('Canning & preserving', 'category', '/canning',      'canning',  2),
+  ('Sauces & condiments',  'category', '/sauces',       'sauces',   3),
+  ('Mains',                'category', '/mains',        'mains',    4),
+  ('Baking',               'category', '/baking',       'baking',   5),
+  ('Seasonal',             'category', '/seasonal',     'seasonal', 6),
+  ('Pickles & ferments',   'category', '/pickles',      'pickles',  7),
+  ('Desserts',             'category', '/desserts',     'desserts', 8)
+ON CONFLICT DO NOTHING;
+
+-- ARTICLES
+CREATE TABLE IF NOT EXISTS articles (
+  id            SERIAL PRIMARY KEY,
+  slug          VARCHAR(255) UNIQUE NOT NULL,
+  title         VARCHAR(255) NOT NULL,
+  subtitle      TEXT,
+  body          TEXT,
+  image_url     TEXT,
+  category      VARCHAR(100),
+  tags          TEXT[],
+  is_published  BOOLEAN DEFAULT FALSE,
+  featured      BOOLEAN DEFAULT FALSE,
+  author_id     INTEGER REFERENCES users(id),
+  created_at    TIMESTAMP DEFAULT NOW(),
+  updated_at    TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);
+CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(is_published);

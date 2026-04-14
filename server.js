@@ -6,6 +6,8 @@ const { pool } = require('./db/pool');
 
 const menuRoutes = require('./routes/menu');
 const homepageRoutes = require('./routes/homepage');
+const contentstripRoutes = require('./routes/contentstrip');
+const articleRoutes = require('./routes/articles');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const commentRoutes = require('./routes/comments');
@@ -34,6 +36,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/menu', menuRoutes);
 app.use('/api/homepage', homepageRoutes);
+app.use('/api/content-strip', contentstripRoutes);
+app.use('/api/articles', articleRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/comments', commentRoutes);

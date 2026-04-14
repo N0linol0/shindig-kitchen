@@ -821,22 +821,35 @@ function showToast(msg) {
 // ── DYNAMIC NAV MENU ──
 async function loadNavMenu() {
   try {
-    const res = await fetch('/api/menu');
-    const data = await res.json();
-    if (!data.items || !data.items.length) return;
-    const active = data.items.filter(m => m.is_active).sort((a,b) => a.position - b.position);
-    const navEl = document.querySelector('.nav-links');
-    if (!navEl) return;
-    navEl.innerHTML = active.map(m => {
-      const isShop = m.page_type === 'shop';
-      return `<li><a class="${isShop?'shop':''}" onclick="handleNavClick('${m.url||'#'}','${m.page_type||''}')">${m.label}</a></li>`;
-    }).join('');
-    // Also update category strip
-    const strip = document.getElementById('cat-strip');
-    if (strip) {
-      strip.innerHTML = `<button class="cat-pill active" onclick="filterCat(this,'all')">All recipes</button>` +
-        active.filter(m => m.page_type === 'category' || m.page_type === 'recipes')
-          .map(m => `<button class="cat-pill" onclick="filterCat(this,'${m.url?.replace('/','')}')">${m.label}</button>`).join('');
+    const [menuRes, stripRes] = await Promise.all([
+      fetch('/api/menu'),
+      fetch('/api/content-strip'),
+    ]);
+    const menuData = await menuRes.json();
+    const stripData = await stripRes.json();
+
+    // Header nav
+    if (menuData.items && menuData.items.length) {
+      const active = menuData.items.filter(m => m.is_active).sort((a,b) => a.position - b.position);
+      const navEl = document.querySelector('.nav-links');
+      if (navEl) {
+        navEl.innerHTML = active.map(m => {
+          const isShop = m.page_type === 'shop';
+          return `<li><a class="${isShop?'shop':''}" onclick="handleNavClick('${m.url||'#'}','${m.page_type||''}')">${m.label}</a></li>`;
+        }).join('');
+      }
+    }
+
+    // Content strip
+    if (stripData.items && stripData.items.length) {
+      const strip = document.getElementById('cat-strip');
+      if (strip) {
+        strip.innerHTML = stripData.items.map((item, i) => {
+          const isAll = item.link_type === 'all';
+          const cat = item.category_slug || '';
+          return `<button class="cat-pill ${i===0?'active':''}" onclick="filterCat(this,'${isAll?'all':cat}')">${item.label}</button>`;
+        }).join('');
+      }
     }
   } catch(e) {}
 }

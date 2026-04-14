@@ -167,26 +167,29 @@
         <div class="nav-item active" onclick="showSection('dashboard')">
           <span class="nav-item-icon">◈</span> Dashboard
         </div>
-        <div class="nav-item" onclick="showSection('recipes')">
-          <span class="nav-item-icon">✦</span> Recipes
-        </div>
-        <div class="nav-item" onclick="showSection('recipe-editor')">
-          <span class="nav-item-icon">＋</span> New Recipe
-        </div>
-        <div class="nav-item" onclick="showSection('products')">
-          <span class="nav-item-icon">🫙</span> Shop Products
-        </div>
-        <div class="nav-item" onclick="showSection('orders')">
-          <span class="nav-item-icon">📦</span> Orders
-        </div>
-        <div class="nav-item" onclick="showSection('comments')">
-          <span class="nav-item-icon">💬</span> Comments
-        </div>
         <div class="nav-item" onclick="showSection('homepage')">
           <span class="nav-item-icon">🏠</span> Homepage editor
         </div>
         <div class="nav-item" onclick="showSection('menu')">
-          <span class="nav-item-icon">☰</span> Navigation menu
+          <span class="nav-item-icon">☰</span> Header menu
+        </div>
+        <div class="nav-item" onclick="showSection('contentstrip')">
+          <span class="nav-item-icon">≡</span> Content strip
+        </div>
+        <div class="nav-item" onclick="showSection('recipes')">
+          <span class="nav-item-icon">✦</span> Recipes
+        </div>
+        <div class="nav-item" onclick="showSection('articles')">
+          <span class="nav-item-icon">📝</span> Articles
+        </div>
+        <div class="nav-item" onclick="showSection('comments')">
+          <span class="nav-item-icon">💬</span> Comments
+        </div>
+        <div class="nav-item" onclick="showSection('products')">
+          <span class="nav-item-icon">🫙</span> Products
+        </div>
+        <div class="nav-item" onclick="showSection('orders')">
+          <span class="nav-item-icon">📦</span> Orders
         </div>
       </nav>
       <div class="sidebar-footer">
@@ -579,10 +582,10 @@
         </div>
       </div>
 
-      <!-- MENU MANAGEMENT -->
+      <!-- HEADER MENU -->
       <div id="section-menu" class="admin-section">
-        <div class="page-title">Navigation menu</div>
-        <div class="page-sub">Add, edit or reorder the links that appear in the site navigation. You can link to recipe categories, custom pages, tools like conversion charts, or external URLs.</div>
+        <div class="page-title">Header menu</div>
+        <div class="page-sub">Manage the links that appear in the top navigation bar.</div>
         <div class="table-wrap">
           <div class="table-header">
             <div class="table-title">Menu items</div>
@@ -631,6 +634,147 @@
               <button class="btn btn-primary btn-sm" onclick="saveMenuItem()">Save item</button>
               <button class="btn btn-sm btn-outline" onclick="document.getElementById('menu-form').style.display='none'">Cancel</button>
               <button class="btn btn-sm btn-danger" id="m-delete-btn" style="display:none;" onclick="deleteMenuItem()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT STRIP -->
+      <div id="section-contentstrip" class="admin-section">
+        <div class="page-title">Content strip</div>
+        <div class="page-sub">The row of filters below the header — All recipes, Canning & preserving, etc. Each item can link to a recipe category, an article category, or any custom URL.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Strip items</div>
+            <button class="btn btn-sm btn-green" onclick="showStripForm()">+ Add item</button>
+          </div>
+          <div id="strip-table-body"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
+        </div>
+        <div id="strip-form" style="display:none;margin-top:1.5rem;">
+          <div class="editor-card">
+            <div class="editor-card-title" id="strip-form-title">New strip item</div>
+            <input type="hidden" id="cs-id" />
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Label *</label>
+                <input class="form-input" id="cs-label" placeholder="e.g. Canning & preserving" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Link type</label>
+                <select class="form-input form-select" id="cs-type" onchange="toggleStripType()">
+                  <option value="all">All recipes</option>
+                  <option value="category">Recipe category</option>
+                  <option value="article_category">Article category</option>
+                  <option value="custom">Custom URL</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field" id="cs-slug-field">
+                <label class="form-label">Category slug</label>
+                <input class="form-input" id="cs-slug" placeholder="e.g. canning" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Position</label>
+                <input class="form-input" type="number" id="cs-pos" value="99" />
+              </div>
+            </div>
+            <div class="form-field" id="cs-url-field" style="display:none;">
+              <label class="form-label">Custom URL</label>
+              <input class="form-input" id="cs-url" placeholder="/tools/conversions" />
+            </div>
+            <div class="form-field">
+              <label class="form-check"><input type="checkbox" id="cs-active" checked /> Visible</label>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary btn-sm" onclick="saveStripItem()">Save item</button>
+              <button class="btn btn-sm btn-outline" onclick="document.getElementById('strip-form').style.display='none'">Cancel</button>
+              <button class="btn btn-sm btn-danger" id="cs-delete-btn" style="display:none;" onclick="deleteStripItem()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTICLES -->
+      <div id="section-articles" class="admin-section">
+        <div class="page-title">Articles</div>
+        <div class="page-sub">Write guides, technique posts, charts, and reference articles. These appear in the content strip and can be linked from anywhere on the site.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">All articles</div>
+            <button class="btn btn-sm btn-green" onclick="newArticle()">+ New article</button>
+          </div>
+          <div id="articles-table-body"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
+        </div>
+
+        <!-- ARTICLE EDITOR -->
+        <div id="article-editor" style="display:none;margin-top:2rem;">
+          <div class="editor-card" style="margin-bottom:1.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+              <div class="editor-card-title" id="article-editor-title" style="margin-bottom:0;">New article</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="saveArticle()">Save article</button>
+                <button class="btn btn-sm btn-outline" onclick="document.getElementById('article-editor').style.display='none';loadArticles()">Cancel</button>
+                <button class="btn btn-sm btn-danger" id="article-delete-btn" style="display:none;" onclick="deleteArticle()">Delete</button>
+              </div>
+            </div>
+            <input type="hidden" id="art-id" />
+            <div class="form-field">
+              <label class="form-label">Title *</label>
+              <input class="form-input" id="art-title" placeholder="e.g. The Complete Guide to Water Bath Canning" style="font-size:1rem;" oninput="autoArticleSlug()" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">Subtitle</label>
+              <input class="form-input" id="art-subtitle" placeholder="A short explanatory line below the title" />
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Slug *</label>
+                <input class="form-input" id="art-slug" placeholder="water-bath-canning-guide" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Category</label>
+                <input class="form-input" id="art-category" placeholder="e.g. canning, technique, charts" />
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-card" style="margin-bottom:1.5rem;">
+            <div class="editor-card-title">Cover image</div>
+            <div class="img-upload-area" id="art-img-area" onclick="document.getElementById('art-img-file').click()">
+              <div id="art-img-placeholder"><div style="font-size:2rem;margin-bottom:8px;">📷</div><div class="img-upload-label">Click to upload cover image</div></div>
+              <img id="art-img-preview" class="img-preview" style="display:none;" />
+            </div>
+            <input type="file" id="art-img-file" accept="image/*" style="display:none;" onchange="handleArticleImageUpload(this)" />
+            <input type="hidden" id="art-image-url" />
+          </div>
+
+          <div class="editor-card" style="margin-bottom:1.5rem;">
+            <div class="editor-card-title">Body content</div>
+            <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="btn btn-sm btn-outline" onclick="insertTag('h2')">H2</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('h3')">H3</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('p')">¶ Para</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('strong')"><b>Bold</b></button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('em')"><i>Italic</i></button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('ul')">• List</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('ol')">1. List</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('blockquote')">" Quote</button>
+              <button class="btn btn-sm btn-outline" onclick="insertImg()">🖼 Image</button>
+              <button class="btn btn-sm btn-outline" onclick="insertTag('hr')">— Divider</button>
+            </div>
+            <textarea class="form-input form-textarea" id="art-body" style="min-height:400px;font-family:monospace;font-size:0.83rem;line-height:1.6;" placeholder="Write your article in HTML. Use the toolbar above to insert tags.&#10;&#10;Example:&#10;&lt;h2&gt;Section heading&lt;/h2&gt;&#10;&lt;p&gt;Your paragraph here.&lt;/p&gt;&#10;&lt;ul&gt;&#10;  &lt;li&gt;List item&lt;/li&gt;&#10;&lt;/ul&gt;"></textarea>
+            <div style="margin-top:10px;">
+              <div class="editor-card-title" style="font-size:0.75rem;margin-bottom:8px;">Preview</div>
+              <div id="art-preview" style="background:var(--bg);border-radius:6px;padding:1.25rem;font-size:0.9rem;line-height:1.75;min-height:80px;color:var(--ink);" onclick="void(0)"></div>
+            </div>
+          </div>
+
+          <div class="editor-card">
+            <div class="editor-card-title">Publishing</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <label class="form-check"><toggle class="toggle-switch"><input type="checkbox" id="art-published" /><span class="toggle-slider"></span></toggle> Published</label>
+              <label class="form-check"><toggle class="toggle-switch"><input type="checkbox" id="art-featured" /><span class="toggle-slider"></span></toggle> Featured</label>
             </div>
           </div>
         </div>
@@ -690,7 +834,7 @@
     document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('section-' + name).classList.add('active');
-    const navMap = { dashboard: 0, recipes: 1, 'recipe-editor': 2, products: 3, orders: 4, comments: 5 };
+    const navMap = { dashboard:0, homepage:1, menu:2, contentstrip:3, recipes:4, articles:5, comments:6, products:7, orders:8 };
     const items = document.querySelectorAll('.nav-item');
     if (navMap[name] !== undefined) items[navMap[name]].classList.add('active');
     if (name === 'recipes') loadRecipes();
@@ -699,6 +843,8 @@
     if (name === 'comments') loadComments();
     if (name === 'menu') loadMenuItems();
     if (name === 'homepage') loadHomepageSections();
+    if (name === 'contentstrip') loadContentStrip();
+    if (name === 'articles') loadArticles();
   }
 
   // DASHBOARD
@@ -1320,6 +1466,245 @@
     showToast('Section deleted', 'success');
     document.getElementById('hp-editor').style.display = 'none';
     loadHomepageSections();
+  }
+
+  // ── CONTENT STRIP ──
+  async function loadContentStrip() {
+    const res = await fetch('/api/content-strip/all');
+    const data = await res.json();
+    const el = document.getElementById('strip-table-body');
+    if (!data.items || !data.items.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No items yet.</div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Position</th><th>Label</th><th>Type</th><th>Category slug</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+      data.items.map(i => `<tr>
+        <td style="color:var(--muted);">${i.position}</td>
+        <td><strong>${i.label}</strong></td>
+        <td><span class="badge badge-gray">${i.link_type}</span></td>
+        <td style="color:var(--muted);font-size:0.8rem;">${i.category_slug||i.url||'—'}</td>
+        <td><span class="badge ${i.is_active?'badge-green':'badge-gray'}">${i.is_active?'Visible':'Hidden'}</span></td>
+        <td><button class="btn btn-sm btn-outline" onclick="editStripItem(${JSON.stringify(i).replace(/"/g,'&quot;')})">Edit</button></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function showStripForm() {
+    document.getElementById('cs-id').value=''; document.getElementById('cs-label').value='';
+    document.getElementById('cs-type').value='category'; document.getElementById('cs-slug').value='';
+    document.getElementById('cs-url').value=''; document.getElementById('cs-pos').value='99';
+    document.getElementById('cs-active').checked=true;
+    document.getElementById('cs-delete-btn').style.display='none';
+    document.getElementById('strip-form-title').textContent='New strip item';
+    document.getElementById('strip-form').style.display='block';
+    toggleStripType();
+    document.getElementById('strip-form').scrollIntoView({behavior:'smooth'});
+  }
+
+  function editStripItem(item) {
+    document.getElementById('cs-id').value=item.id;
+    document.getElementById('cs-label').value=item.label;
+    document.getElementById('cs-type').value=item.link_type;
+    document.getElementById('cs-slug').value=item.category_slug||'';
+    document.getElementById('cs-url').value=item.url||'';
+    document.getElementById('cs-pos').value=item.position;
+    document.getElementById('cs-active').checked=item.is_active;
+    document.getElementById('cs-delete-btn').style.display='inline-flex';
+    document.getElementById('strip-form-title').textContent='Edit strip item';
+    document.getElementById('strip-form').style.display='block';
+    toggleStripType();
+    document.getElementById('strip-form').scrollIntoView({behavior:'smooth'});
+  }
+
+  function toggleStripType() {
+    const t = document.getElementById('cs-type').value;
+    document.getElementById('cs-slug-field').style.display = (t==='category'||t==='article_category') ? 'block' : 'none';
+    document.getElementById('cs-url-field').style.display = t==='custom' ? 'block' : 'none';
+  }
+
+  async function saveStripItem() {
+    const id = document.getElementById('cs-id').value;
+    const type = document.getElementById('cs-type').value;
+    const slug = document.getElementById('cs-slug').value;
+    const body = {
+      label: document.getElementById('cs-label').value,
+      link_type: type,
+      category_slug: slug,
+      url: type==='custom' ? document.getElementById('cs-url').value : (slug ? '/'+slug : '/'),
+      position: parseInt(document.getElementById('cs-pos').value)||99,
+      is_active: document.getElementById('cs-active').checked,
+    };
+    if (!body.label) { showToast('Label is required','error'); return; }
+    const url = id ? `/api/content-strip/${id}` : '/api/content-strip';
+    const res = await fetch(url, { method: id?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (res.ok) { showToast('Saved ✓','success'); document.getElementById('strip-form').style.display='none'; loadContentStrip(); }
+    else showToast('Error saving','error');
+  }
+
+  async function deleteStripItem() {
+    const id = document.getElementById('cs-id').value;
+    if (!id||!confirm('Delete this strip item?')) return;
+    await fetch(`/api/content-strip/${id}`, {method:'DELETE'});
+    showToast('Deleted','success');
+    document.getElementById('strip-form').style.display='none';
+    loadContentStrip();
+  }
+
+  // ── ARTICLES ──
+  async function loadArticles() {
+    const res = await fetch('/api/articles/admin/all');
+    const data = await res.json();
+    const el = document.getElementById('articles-table-body');
+    if (!data.articles||!data.articles.length) {
+      el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No articles yet. <a href="#" onclick="newArticle()" style="color:var(--accent);">Write your first one →</a></div>';
+      return;
+    }
+    el.innerHTML=`<table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${
+      data.articles.map(a=>`<tr>
+        <td><strong>${a.title}</strong>${a.subtitle?`<br><span style="font-size:0.78rem;color:var(--muted);">${a.subtitle}</span>`:''}</td>
+        <td>${a.category||'—'}</td>
+        <td><span class="badge ${a.is_published?'badge-green':'badge-gray'}">${a.is_published?'Published':'Draft'}</span>${a.featured?' <span class="badge badge-yellow">Featured</span>':''}</td>
+        <td style="font-size:0.78rem;color:var(--muted);">${new Date(a.created_at).toLocaleDateString()}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-sm btn-outline" onclick="editArticle(${JSON.stringify(a).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteArticleById(${a.id})">Delete</button>
+        </div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function newArticle() {
+    document.getElementById('art-id').value='';
+    document.getElementById('art-title').value=''; document.getElementById('art-subtitle').value='';
+    document.getElementById('art-slug').value=''; document.getElementById('art-category').value='';
+    document.getElementById('art-body').value=''; document.getElementById('art-image-url').value='';
+    document.getElementById('art-img-preview').style.display='none';
+    document.getElementById('art-img-placeholder').style.display='block';
+    document.getElementById('art-published').checked=false; document.getElementById('art-featured').checked=false;
+    document.getElementById('art-delete-btn').style.display='none';
+    document.getElementById('article-editor-title').textContent='New article';
+    document.getElementById('article-editor').style.display='block';
+    document.getElementById('art-preview').innerHTML='';
+    document.getElementById('article-editor').scrollIntoView({behavior:'smooth'});
+    document.getElementById('art-body').addEventListener('input', () => {
+      document.getElementById('art-preview').innerHTML = document.getElementById('art-body').value;
+    });
+  }
+
+  function editArticle(a) {
+    document.getElementById('art-id').value=a.id;
+    document.getElementById('art-title').value=a.title||'';
+    document.getElementById('art-subtitle').value=a.subtitle||'';
+    document.getElementById('art-slug').value=a.slug||'';
+    document.getElementById('art-category').value=a.category||'';
+    document.getElementById('art-body').value=a.body||'';
+    document.getElementById('art-image-url').value=a.image_url||'';
+    document.getElementById('art-published').checked=a.is_published;
+    document.getElementById('art-featured').checked=a.featured;
+    document.getElementById('art-delete-btn').style.display='inline-flex';
+    document.getElementById('article-editor-title').textContent='Edit article';
+    if (a.image_url) {
+      document.getElementById('art-img-preview').src=a.image_url;
+      document.getElementById('art-img-preview').style.display='block';
+      document.getElementById('art-img-placeholder').style.display='none';
+    } else {
+      document.getElementById('art-img-preview').style.display='none';
+      document.getElementById('art-img-placeholder').style.display='block';
+    }
+    document.getElementById('art-preview').innerHTML=a.body||'';
+    document.getElementById('article-editor').style.display='block';
+    document.getElementById('article-editor').scrollIntoView({behavior:'smooth'});
+    document.getElementById('art-body').oninput = () => {
+      document.getElementById('art-preview').innerHTML = document.getElementById('art-body').value;
+    };
+  }
+
+  function autoArticleSlug() {
+    const t = document.getElementById('art-title').value;
+    document.getElementById('art-slug').value = t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  }
+
+  function insertTag(tag) {
+    const ta = document.getElementById('art-body');
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const sel = ta.value.substring(start, end);
+    let insert = '';
+    if (tag==='hr') insert='\n<hr>\n';
+    else if (tag==='ul') insert=`\n<ul>\n  <li>${sel||'Item'}</li>\n</ul>\n`;
+    else if (tag==='ol') insert=`\n<ol>\n  <li>${sel||'Item'}</li>\n</ol>\n`;
+    else if (tag==='blockquote') insert=`\n<blockquote><p>${sel||'Quote here'}</p></blockquote>\n`;
+    else insert=`<${tag}>${sel||'Text here'}</${tag}>`;
+    ta.setRangeText(insert, start, end, 'end');
+    document.getElementById('art-preview').innerHTML = ta.value;
+    ta.focus();
+  }
+
+  async function insertImg() {
+    const input = document.createElement('input');
+    input.type='file'; input.accept='image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const formData = new FormData(); formData.append('image', file);
+      showToast('Uploading...');
+      const res = await fetch('/api/upload', {method:'POST', body:formData});
+      const d = await res.json();
+      if (d.url) {
+        const ta = document.getElementById('art-body');
+        const ins = `\n<figure><img src="${d.url}" alt="" style="width:100%;border-radius:8px;"><figcaption>Caption here</figcaption></figure>\n`;
+        ta.setRangeText(ins, ta.selectionStart, ta.selectionEnd, 'end');
+        document.getElementById('art-preview').innerHTML = ta.value;
+        showToast('Image inserted ✓','success');
+      }
+    };
+    input.click();
+  }
+
+  async function handleArticleImageUpload(input) {
+    const file = input.files[0]; if (!file) return;
+    const formData = new FormData(); formData.append('image', file);
+    showToast('Uploading cover image...');
+    const res = await fetch('/api/upload', {method:'POST', body:formData});
+    const d = await res.json();
+    if (d.url) {
+      document.getElementById('art-image-url').value=d.url;
+      document.getElementById('art-img-preview').src=d.url;
+      document.getElementById('art-img-preview').style.display='block';
+      document.getElementById('art-img-placeholder').style.display='none';
+      showToast('Cover image uploaded ✓','success');
+    }
+  }
+
+  async function saveArticle() {
+    const id = document.getElementById('art-id').value;
+    const body = {
+      title: document.getElementById('art-title').value,
+      slug: document.getElementById('art-slug').value,
+      subtitle: document.getElementById('art-subtitle').value,
+      body: document.getElementById('art-body').value,
+      image_url: document.getElementById('art-image-url').value||null,
+      category: document.getElementById('art-category').value,
+      is_published: document.getElementById('art-published').checked,
+      featured: document.getElementById('art-featured').checked,
+    };
+    if (!body.title||!body.slug) { showToast('Title and slug are required','error'); return; }
+    const url = id ? `/api/articles/${id}` : '/api/articles';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    if (res.ok) { showToast('Article saved ✓','success'); document.getElementById('article-editor').style.display='none'; loadArticles(); }
+    else showToast('Error saving article','error');
+  }
+
+  async function deleteArticle() {
+    const id = document.getElementById('art-id').value;
+    await deleteArticleById(id);
+  }
+
+  async function deleteArticleById(id) {
+    if (!confirm('Delete this article? This cannot be undone.')) return;
+    await fetch(`/api/articles/${id}`, {method:'DELETE'});
+    showToast('Article deleted','success');
+    document.getElementById('article-editor').style.display='none';
+    loadArticles();
   }
 
 </script>
