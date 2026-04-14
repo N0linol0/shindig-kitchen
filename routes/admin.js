@@ -54,18 +54,18 @@ router.post('/recipes', async (req, res) => {
 });
 
 router.put('/recipes/:id', async (req, res) => {
-  const { title, slug, description, category_id, prep_time, cook_time, base_servings, ingredients, steps, notes, tags, is_vegan, is_published, featured, image_url } = req.body;
+  const { title, slug, description, category_id, prep_time, cook_time, base_servings, ingredients, steps, notes, tags, is_vegan, is_published, image_url } = req.body;
   try {
     const result = await pool.query(`
       UPDATE recipes SET title=$1, slug=$2, description=$3, category_id=$4, prep_time=$5, cook_time=$6,
       base_servings=$7, ingredients=$8, steps=$9, notes=$10, tags=$11, is_vegan=$12,
-      is_published=$13, featured=$14, image_url=$15, updated_at=NOW()
-      WHERE id=$16 RETURNING *
-    `, [title, slug, description, category_id, prep_time, cook_time, base_servings, JSON.stringify(ingredients), JSON.stringify(steps), notes, tags, is_vegan, is_published, featured, image_url, req.params.id]);
+      is_published=$13, image_url=$14, updated_at=NOW()
+      WHERE id=$15 RETURNING *
+    `, [title, slug, description, category_id, prep_time, cook_time, base_servings, JSON.stringify(ingredients), JSON.stringify(steps), notes, tags, is_vegan, is_published, image_url, req.params.id]);
     res.json({ recipe: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: err.message });
   }
 });
 
