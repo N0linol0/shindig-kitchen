@@ -441,52 +441,6 @@
         </div>
       </div>
 
-      <!-- USERS -->
-      <div id="section-users" class="admin-section">
-        <div class="page-title">Users</div>
-        <div class="page-sub">All registered accounts. You can change roles or delete accounts here.</div>
-        <div class="table-wrap">
-          <div class="table-header">
-            <div class="table-title">Registered users</div>
-            <div id="user-count" style="font-size:0.8rem;color:var(--muted);"></div>
-          </div>
-          <div id="users-table-body"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
-        </div>
-        <div id="user-edit-form" style="display:none;margin-top:1.5rem;">
-          <div class="editor-card">
-            <div class="editor-card-title" id="user-edit-title">Edit user</div>
-            <input type="hidden" id="ue-id" />
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Display name</label>
-                <input class="form-input" id="ue-display" />
-              </div>
-              <div class="form-field">
-                <label class="form-label">Username</label>
-                <input class="form-input" id="ue-username" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Email</label>
-                <input class="form-input" id="ue-email" type="email" />
-              </div>
-              <div class="form-field">
-                <label class="form-label">Role</label>
-                <select class="form-input form-select" id="ue-role">
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:12px;">
-              <button class="btn btn-primary btn-sm" onclick="saveUser()">Save</button>
-              <button class="btn btn-sm btn-outline" onclick="document.getElementById('user-edit-form').style.display='none'">Cancel</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteUser()">Delete user</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- HOMEPAGE EDITOR -->
       <div id="section-homepage" class="admin-section">
@@ -1555,65 +1509,6 @@
     loadHomepageSections();
   }
 
-  // ── USERS ──
-  async function loadUsers() {
-    const el = document.getElementById('users-table-body');
-    try {
-      const res = await fetch('/api/users');
-      if (!res.ok) { el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Error: ${res.statusText}</div>`; return; }
-      const data = await res.json();
-      const users = data.users || [];
-      document.getElementById('user-count').textContent = users.length + ' user' + (users.length !== 1 ? 's' : '');
-      if (!users.length) { el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No users yet.</div>'; return; }
-      el.innerHTML = `<table><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${
-        users.map(u => `<tr>
-          <td><strong>${u.display_name || '—'}</strong></td>
-          <td style="color:var(--muted);">@${u.username}</td>
-          <td style="font-size:0.82rem;">${u.email}</td>
-          <td><span class="badge ${u.role === 'admin' ? 'badge-green' : 'badge-gray'}">${u.role}</span></td>
-          <td style="font-size:0.78rem;color:var(--muted);">${new Date(u.created_at).toLocaleDateString()}</td>
-          <td><button class="btn btn-sm btn-outline" onclick="editUser(${JSON.stringify(u).replace(/"/g,'&quot;')})">Edit</button></td>
-        </tr>`).join('')
-      }</tbody></table>`;
-    } catch(e) {
-      el.innerHTML = `<div style="padding:1rem;color:#C0392B;font-size:0.85rem;">Failed: ${e.message}</div>`;
-    }
-  }
-
-  function editUser(u) {
-    document.getElementById('ue-id').value = u.id;
-    document.getElementById('ue-display').value = u.display_name || '';
-    document.getElementById('ue-username').value = u.username;
-    document.getElementById('ue-email').value = u.email;
-    document.getElementById('ue-role').value = u.role;
-    document.getElementById('user-edit-title').textContent = 'Edit: ' + (u.display_name || u.username);
-    document.getElementById('user-edit-form').style.display = 'block';
-    document.getElementById('user-edit-form').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  async function saveUser() {
-    const id = document.getElementById('ue-id').value;
-    const body = {
-      display_name: document.getElementById('ue-display').value,
-      username: document.getElementById('ue-username').value,
-      email: document.getElementById('ue-email').value,
-      role: document.getElementById('ue-role').value,
-    };
-    const res = await fetch(`/api/users/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    if (res.ok) { showToast('User saved ✓', 'success'); document.getElementById('user-edit-form').style.display='none'; loadUsers(); }
-    else { const e = await res.json().catch(()=>({})); showToast('Error: '+(e.error||res.statusText), 'error'); }
-  }
-
-  async function deleteUser() {
-    const id = document.getElementById('ue-id').value;
-    const name = document.getElementById('ue-display').value || document.getElementById('ue-username').value;
-    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
-    const res = await fetch(`/api/users/${id}`, { method:'DELETE' });
-    if (res.ok) { showToast('User deleted', 'success'); document.getElementById('user-edit-form').style.display='none'; loadUsers(); }
-    else { const e = await res.json().catch(()=>({})); showToast('Error: '+(e.error||res.statusText), 'error'); }
-  }
-
-</script>
   async function loadContentStrip() {
     const el = document.getElementById('strip-table-body');
     try {
