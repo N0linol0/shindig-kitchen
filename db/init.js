@@ -143,6 +143,9 @@ async function initDB() {
       );
     `);
 
+    // Migrations — safe to run repeatedly
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT FALSE`);
+
     // Seed default content strip if empty
     const strip = await client.query('SELECT COUNT(*) FROM content_strip_items');
     if (parseInt(strip.rows[0].count) === 0) {

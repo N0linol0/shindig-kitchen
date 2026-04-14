@@ -172,4 +172,83 @@ router.delete('/comments/:id', async (req, res) => {
   }
 });
 
+// ── USERS ──
+router.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT u.id, u.email, u.username, u.display_name, u.role,
+             u.is_suspended, u.created_at,
+             COUNT(DISTINCT c.id) AS comment_count,
+             COUNT(DISTINCT rl.recipe_id) AS likes_count
+      FROM users u
+      LEFT JOIN comments c ON c.user_id = u.id
+      LEFT JOIN recipe_likes rl ON rl.user_id = u.id
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
+    res.json({ users: result.rows });
+  } catch (err) {
+    console.error('admin GET /users:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/users/:id/role', async (req, res) => {
+  const { role } = req.body;
+  if (!['user', 'admin'].includes(role)) return res.status(400).json({ error: 'Invalid role' });
+  // Prevent demoting yourself
+  if (parseInt(req.params.id) === req.session.userId && role !== 'admin') {
+    return res.status(400).json({ error: 'You cannot remove your own admin role' });
+  }
+  try {
+    await pool.query('UPDATE users SET role=$1 WHERE id=$2', [role, req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/users/:id/suspend', async (req, res) => {
+  const { is_suspended } = req.body;
+  if (parseInt(req.params.id) === req.session.userId) {
+    return res.status(400).json({ error: 'You cannot suspend yourself' });
+  }
+  try {
+    await pool.query('UPDATE users SET is_suspended=$1 WHERE id=$2', [is_suspended, req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/users/:id/reset-password', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    // Generate a readable temporary password
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const tempPassword = Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const hash = await bcrypt.hash(tempPassword, 12);
+    await pool.query('UPDATE users SET password=$1 WHERE id=$2', [hash, req.params.id]);
+    res.json({ ok: true, tempPassword });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  if (parseInt(req.params.id) === req.session.userId) {
+    return res.status(400).json({ error: 'You cannot delete yourself' });
+  }
+  try {
+    // Clean up related records first
+    await pool.query('DELETE FROM recipe_likes WHERE user_id=$1', [req.params.id]);
+    await pool.query('DELETE FROM saved_recipes WHERE user_id=$1', [req.params.id]);
+    await pool.query('DELETE FROM comments WHERE user_id=$1', [req.params.id]);
+    await pool.query('DELETE FROM users WHERE id=$1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
