@@ -8,52 +8,40 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #F8F7F4;
-      --surface: #F0EEE9;
-      --ink: #1A1A18;
-      --muted: #9A9288;
-      --accent: #4A6741;
-      --accent-dark: #2C3B28;
-      --border: rgba(26,26,24,0.07);
+      --bg: #F8F7F4; --surface: #F0EEE9; --ink: #1A1A18; --muted: #9A9288;
+      --accent: #4A6741; --accent-dark: #2C3B28; --border: rgba(26,26,24,0.07);
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
     }
     html { scroll-behavior: smooth; }
     body { background: var(--bg); font-family: var(--font-body); color: var(--ink); }
-
-    /* PAGES */
-    .page { display: none; }
-    .page.active { display: block; }
+    .page { display: none; } .page.active { display: block; }
 
     /* NAV */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.5rem 3rem;
-      background: var(--bg);
-      position: sticky; top: 0; z-index: 100;
-    }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 3rem; background: var(--bg); position: sticky; top: 0; z-index: 100; }
     .logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); cursor: pointer; }
     .logo em { color: var(--accent); font-style: italic; }
     .nav-links { display: flex; gap: 2.5rem; list-style: none; }
     .nav-links a { font-size: 0.83rem; color: var(--muted); text-decoration: none; transition: color 0.2s; cursor: pointer; }
     .nav-links a:hover { color: var(--ink); }
     .nav-links a.shop { color: var(--accent); font-weight: 500; }
-    .nav-right { display: flex; align-items: center; gap: 2rem; }
-    .nav-text-btn { background: none; border: none; cursor: pointer; font-size: 0.83rem; color: var(--muted); font-family: var(--font-body); transition: color 0.2s; padding: 0; display: flex; align-items: center; gap: 5px; }
-    .nav-text-btn:hover { color: var(--ink); }
+    .nav-right { display: flex; align-items: center; gap: 1.75rem; }
+    .nav-icon-btn { background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 5px; font-size: 0.83rem; font-family: var(--font-body); transition: color 0.2s; padding: 0; }
+    .nav-icon-btn:hover { color: var(--ink); }
+    .nav-icon-btn svg { width: 16px; height: 16px; stroke-width: 1.75; }
+    .nav-auth-btn { background: none; border: none; cursor: pointer; font-size: 0.83rem; font-family: var(--font-body); color: var(--muted); transition: color 0.2s; padding: 0; }
+    .nav-auth-btn:hover { color: var(--ink); }
+    .nav-user { display: flex; align-items: center; gap: 8px; }
+    .nav-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 500; }
 
     /* CATEGORY STRIP */
     .category-strip { display: flex; padding: 0 3rem; overflow-x: auto; scrollbar-width: none; }
     .category-strip::-webkit-scrollbar { display: none; }
-    .cat-pill {
-      flex-shrink: 0; padding: 0.65rem 0 0.65rem 0; margin-right: 2rem;
-      font-size: 0.8rem; color: var(--muted); cursor: pointer;
-      background: none; border: none; font-family: var(--font-body);
-      transition: color 0.2s; white-space: nowrap; position: relative;
-    }
+    .cat-pill { flex-shrink: 0; padding: 0.65rem 0; margin-right: 2rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; background: none; border: none; font-family: var(--font-body); transition: color 0.2s; white-space: nowrap; position: relative; }
     .cat-pill::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
     .cat-pill:hover { color: var(--ink); }
     .cat-pill.active { color: var(--ink); font-weight: 500; }
@@ -80,8 +68,9 @@
     .badge-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
     .badge-title { font-family: var(--font-display); font-size: 0.93rem; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
     .badge-actions { display: flex; gap: 14px; }
-    .icon-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 3px; font-family: var(--font-body); transition: color 0.15s; padding: 0; }
-    .icon-btn:hover, .icon-btn.liked { color: var(--accent); }
+    .icon-btn { background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 4px; font-family: var(--font-body); font-size: 12px; transition: color 0.15s; padding: 0; }
+    .icon-btn svg { width: 14px; height: 14px; stroke-width: 1.75; }
+    .icon-btn:hover, .icon-btn.active { color: var(--accent); }
 
     /* SECTION */
     .section { padding: 3.5rem 3rem; }
@@ -94,19 +83,21 @@
     .recipe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.25rem; }
     .recipe-card { cursor: pointer; }
     .recipe-card:hover .r-title { color: var(--accent); }
-    .recipe-img { width: 100%; aspect-ratio: 4/3; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; position: relative; display: flex; align-items: center; justify-content: center; font-size: 3rem; transition: transform 0.3s; }
+    .recipe-img { width: 100%; aspect-ratio: 4/3; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; position: relative; display: flex; align-items: center; justify-content: center; font-size: 3rem; transition: transform 0.3s; background: var(--surface); }
     .recipe-card:hover .recipe-img { transform: scale(1.02); }
-    .save-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(248,247,244,0.88); backdrop-filter: blur(6px); border: none; cursor: pointer; font-size: 13px; color: var(--muted); transition: all 0.15s; }
-    .save-btn:hover { transform: scale(1.1); }
-    .save-btn.saved { color: var(--accent); }
+    .recipe-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .save-btn { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(248,247,244,0.88); backdrop-filter: blur(6px); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: var(--muted); }
+    .save-btn svg { width: 14px; height: 14px; stroke-width: 1.75; }
+    .save-btn:hover, .save-btn.active { color: var(--accent); transform: scale(1.1); }
     .r-meta { font-size: 0.66rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; }
     .r-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin-bottom: 5px; transition: color 0.2s; }
     .r-desc { font-size: 0.81rem; color: var(--muted); line-height: 1.65; margin-bottom: 10px; }
     .r-foot { display: flex; align-items: center; justify-content: space-between; }
     .r-time { font-size: 0.71rem; color: var(--muted); }
     .r-actions { display: flex; gap: 12px; }
-    .r-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 3px; font-family: var(--font-body); transition: color 0.15s; padding: 0; }
-    .r-btn:hover, .r-btn.liked { color: var(--accent); }
+    .r-btn { background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 4px; font-family: var(--font-body); font-size: 12px; transition: color 0.15s; padding: 0; }
+    .r-btn svg { width: 13px; height: 13px; stroke-width: 1.75; }
+    .r-btn:hover, .r-btn.active { color: var(--accent); }
 
     /* SHOP TEASER */
     .shop-teaser { margin: 0 3rem 3.5rem; background: var(--accent-dark); border-radius: 10px; padding: 2.75rem 3rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
@@ -133,37 +124,43 @@
     .sp-name { font-size: 0.84rem; font-weight: 500; margin-bottom: 2px; }
     .sp-count { font-size: 0.71rem; color: var(--muted); }
 
+    /* NEWSLETTER */
+    .newsletter { margin: 0 3rem 3.5rem; border-radius: 10px; padding: 2.5rem 3rem; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+    .newsletter-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .newsletter-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .newsletter-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+    .newsletter-form { display: flex; gap: 8px; flex-shrink: 0; }
+    .newsletter-input { font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: white; border: none; border-radius: 4px; padding: 10px 16px; width: 240px; outline: none; transition: box-shadow 0.2s; }
+    .newsletter-input:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.2); }
+    .newsletter-input::placeholder { color: var(--muted); }
+
     /* FOOTER */
-    footer { padding: 2.5rem 3rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); margin-top: 1rem; }
+    footer { padding: 2.5rem 3rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
     .footer-logo { font-family: var(--font-display); font-size: 1.1rem; cursor: pointer; }
     .footer-logo em { color: var(--accent); font-style: italic; }
-    .footer-links { display: flex; gap: 2rem; }
-    .footer-links a { font-size: 0.78rem; color: var(--muted); text-decoration: none; transition: color 0.2s; cursor: pointer; }
-    .footer-links a:hover { color: var(--ink); }
-    .footer-social { display: flex; gap: 1.5rem; }
-    .footer-social button { background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--muted); font-family: var(--font-body); transition: color 0.2s; padding: 0; }
-    .footer-social button:hover { color: var(--ink); }
+    .footer-copy { font-size: 0.75rem; color: var(--muted); }
+    .footer-social { display: flex; gap: 1.25rem; }
+    .footer-social a { color: var(--muted); transition: color 0.2s; display: flex; align-items: center; cursor: pointer; }
+    .footer-social a svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .footer-social a:hover { color: var(--ink); }
 
-    /* ===================== RECIPE PAGE ===================== */
+    /* RECIPE PAGE */
     .recipe-page-wrap { max-width: 1100px; margin: 0 auto; padding: 3rem 3rem 5rem; }
-
     .breadcrumb { font-size: 0.75rem; color: var(--muted); margin-bottom: 2rem; display: flex; gap: 6px; align-items: center; }
     .breadcrumb a { color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
     .breadcrumb a:hover { color: var(--ink); }
-    .breadcrumb-sep { opacity: 0.4; }
-
-    .recipe-hero-img { width: 100%; height: 420px; border-radius: 12px; background: linear-gradient(135deg, #D0DFC8 0%, #A8C49C 100%); display: flex; align-items: center; justify-content: center; font-size: 6rem; margin-bottom: 2.5rem; position: relative; overflow: hidden; }
-    .recipe-hero-img-placeholder { opacity: 0.6; }
-
+    .recipe-hero-img { width: 100%; height: 420px; border-radius: 12px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 6rem; margin-bottom: 2.5rem; overflow: hidden; position: relative; }
+    .recipe-hero-img img { width: 100%; height: 100%; object-fit: cover; }
     .recipe-page-header { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; margin-bottom: 2rem; }
     .recipe-page-category { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
     .recipe-page-title { font-family: var(--font-display); font-size: 2.4rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 0.85rem; }
     .recipe-page-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.8; max-width: 580px; }
-    .recipe-page-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-    .recipe-action-btn { background: none; border: none; cursor: pointer; font-size: 0.82rem; color: var(--muted); font-family: var(--font-body); display: flex; align-items: center; gap: 6px; transition: color 0.2s; padding: 4px 0; }
-    .recipe-action-btn:hover, .recipe-action-btn.liked { color: var(--accent); }
+    .recipe-page-actions { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+    .recipe-action-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-family: var(--font-body); display: flex; align-items: center; gap: 6px; font-size: 0.82rem; transition: color 0.2s; padding: 4px 0; }
+    .recipe-action-btn svg { width: 15px; height: 15px; stroke-width: 1.75; }
+    .recipe-action-btn:hover, .recipe-action-btn.active { color: var(--accent); }
 
-    /* CONTROLS BAR */
+    /* CONTROLS */
     .recipe-controls { display: flex; align-items: center; gap: 2rem; padding: 1.25rem 0; margin-bottom: 2.5rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
     .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
     .ctrl-label { font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
@@ -178,7 +175,6 @@
 
     /* RECIPE BODY */
     .recipe-body { display: grid; grid-template-columns: 260px 1fr; gap: 4rem; }
-
     .ing-section-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; margin-bottom: 1.5rem; }
     .ing-group-label { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 1.5rem 0 0.75rem; font-weight: 500; }
     .ing-group-label:first-of-type { margin-top: 0; }
@@ -186,15 +182,11 @@
     .ing-row:last-child { border-bottom: none; }
     .ing-name { color: var(--ink); line-height: 1.4; }
     .ing-qty { color: #4A4640; font-size: 0.95rem; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
-
     .steps-section-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; margin-bottom: 1.75rem; }
     .step { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; }
-    .step-n { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: var(--accent); opacity: 0.5; line-height: 1.3; flex-shrink: 0; width: 28px; }
-    .step-inner {}
+    .step-n { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: var(--accent); opacity: 0.4; line-height: 1.3; flex-shrink: 0; width: 28px; }
     .step-title { font-size: 1rem; font-weight: 500; margin-bottom: 6px; }
     .step-text { font-size: 0.975rem; color: #4A4640; line-height: 1.85; }
-
-    /* NOTES */
     .recipe-notes { margin-top: 3rem; padding: 1.5rem; background: var(--surface); border-radius: 8px; border-left: 3px solid var(--accent); }
     .recipe-notes-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500; }
     .recipe-notes-text { font-size: 0.95rem; color: #4A4640; line-height: 1.75; }
@@ -204,33 +196,55 @@
     .comments-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; margin-bottom: 2rem; }
     .comment-form { margin-bottom: 2.5rem; }
     .comment-form textarea { width: 100%; font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: var(--surface); border: none; border-radius: 8px; padding: 14px 16px; resize: vertical; min-height: 90px; outline: none; line-height: 1.6; }
-    .comment-form textarea::placeholder { color: var(--muted); }
     .comment-form textarea:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.2); }
-    .comment-form-foot { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .comment-form textarea::placeholder { color: var(--muted); }
+    .comment-form-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .comment-login-note { font-size: 0.8rem; color: var(--muted); }
+    .comment-login-note a { color: var(--accent); cursor: pointer; }
     .comment { display: flex; gap: 14px; margin-bottom: 2rem; }
     .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 500; color: var(--accent); flex-shrink: 0; }
-    .comment-body {}
     .comment-author { font-size: 0.82rem; font-weight: 500; margin-bottom: 2px; }
     .comment-date { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
     .comment-text { font-size: 0.95rem; color: #3A3830; line-height: 1.75; }
-    .comment-like { background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--muted); font-family: var(--font-body); margin-top: 6px; padding: 0; transition: color 0.2s; }
-    .comment-like:hover { color: var(--accent); }
+    .comment-like-btn { background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--muted); font-family: var(--font-body); margin-top: 6px; padding: 0; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
+    .comment-like-btn svg { width: 12px; height: 12px; stroke-width: 1.75; }
+    .comment-like-btn:hover { color: var(--accent); }
+
+    /* AUTH MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(26,26,24,0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: white; border-radius: 14px; padding: 2.25rem; width: 380px; max-width: 90vw; position: relative; }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.2rem; }
+    .modal-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .modal-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .modal-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .modal-tab { font-family: var(--font-body); font-size: 0.85rem; background: none; border: none; padding: 0.6rem 1.25rem 0.6rem 0; cursor: pointer; color: var(--muted); margin-right: 1.25rem; position: relative; transition: color 0.2s; }
+    .modal-tab::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 1.5px; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
+    .modal-tab.active { color: var(--ink); font-weight: 500; }
+    .modal-tab.active::after { opacity: 1; }
+    .modal-field { margin-bottom: 1rem; }
+    .modal-field label { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .modal-field input { width: 100%; font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: var(--bg); border: none; border-radius: 6px; padding: 10px 13px; outline: none; transition: box-shadow 0.2s; }
+    .modal-field input:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.2); }
+    .modal-error { font-size: 0.8rem; color: #C0392B; margin-bottom: 0.75rem; min-height: 1.1rem; }
+    .modal-form { display: none; } .modal-form.active { display: block; }
 
     /* TOAST */
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--ink); color: white; font-size: 0.82rem; padding: 9px 18px; border-radius: 4px; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 999; font-family: var(--font-body); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* RESPONSIVE */
     @media (max-width: 900px) {
       nav, .section { padding-left: 1.5rem; padding-right: 1.5rem; }
       .category-strip { padding-left: 1.5rem; }
       .strip-sep { margin: 0 1.5rem; }
+      .shop-teaser, .spotlight, .newsletter { margin-left: 1.5rem; margin-right: 1.5rem; }
       .recipe-grid { grid-template-columns: repeat(2, 1fr); }
-      .shop-teaser { flex-direction: column; align-items: flex-start; margin: 0 1.5rem 2.5rem; }
-      .spotlight { grid-template-columns: 1fr; margin: 0 1.5rem 2.5rem; }
+      .shop-teaser { flex-direction: column; align-items: flex-start; }
+      .spotlight { grid-template-columns: 1fr; }
+      .newsletter { flex-direction: column; }
       .recipe-page-wrap { padding: 2rem 1.5rem 4rem; }
       .recipe-body { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem 1.5rem; }
+      footer { flex-direction: column; gap: 1.25rem; text-align: center; padding: 2rem 1.5rem; }
     }
     @media (max-width: 600px) {
       nav { padding: 1.1rem 1.25rem; }
@@ -240,16 +254,41 @@
       .hero-badge { right: 1rem; bottom: 1rem; min-width: 160px; }
       .recipe-grid { grid-template-columns: 1fr; }
       .recipe-page-header { grid-template-columns: 1fr; }
-      .recipe-page-actions { flex-direction: row; align-items: center; }
-      .recipe-meta-row { margin-left: 0; }
-      .recipe-controls { gap: 1rem; }
+      .newsletter-form { flex-direction: column; width: 100%; }
+      .newsletter-input { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-<!-- ============ NAV (shared) ============ -->
-<nav id="main-nav">
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Shindig<em style="color:var(--accent);font-style:italic;">Kitchen</em></div>
+    <div class="modal-sub">Join the community to like, save and comment.</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('login')">Sign in</button>
+      <button class="modal-tab" onclick="switchTab('register')">Create account</button>
+    </div>
+    <div class="modal-error" id="auth-error"></div>
+    <div class="modal-form active" id="form-login">
+      <div class="modal-field"><label>Email</label><input type="email" id="l-email" placeholder="you@example.com" /></div>
+      <div class="modal-field"><label>Password</label><input type="password" id="l-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitLogin()" /></div>
+      <button class="btn-filled" style="width:100%;padding:11px;" onclick="submitLogin()">Sign in</button>
+    </div>
+    <div class="modal-form" id="form-register">
+      <div class="modal-field"><label>Display name</label><input type="text" id="r-dname" placeholder="Your name" /></div>
+      <div class="modal-field"><label>Username</label><input type="text" id="r-uname" placeholder="shindigfan" /></div>
+      <div class="modal-field"><label>Email</label><input type="email" id="r-email" placeholder="you@example.com" /></div>
+      <div class="modal-field"><label>Password</label><input type="password" id="r-pass" placeholder="••••••••" /></div>
+      <button class="btn-filled" style="width:100%;padding:11px;" onclick="submitRegister()">Create account</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
   <div class="logo" onclick="showPage('home')">Shindig<em>Kitchen</em></div>
   <ul class="nav-links">
     <li><a onclick="showPage('home')">Recipes</a></li>
@@ -258,15 +297,15 @@
     <li><a class="shop">Shop</a></li>
   </ul>
   <div class="nav-right">
-    <button class="nav-text-btn">⌕ Search</button>
-    <button class="nav-text-btn">🔖 <span id="saved-count">0</span> saved</button>
-    <button class="nav-text-btn">🛒 Cart</button>
+    <button class="nav-icon-btn"><i data-lucide="search"></i></button>
+    <button class="nav-icon-btn" onclick="requireAuth()"><i data-lucide="bookmark"></i> <span id="saved-count">0</span></button>
+    <button class="nav-icon-btn"><i data-lucide="shopping-cart"></i></button>
+    <div id="nav-auth-area"><button class="nav-auth-btn" onclick="openModal()">Sign in</button></div>
   </div>
 </nav>
 
-<!-- ============ HOME PAGE ============ -->
+<!-- HOME PAGE -->
 <div id="page-home" class="page active">
-
   <div class="category-strip">
     <button class="cat-pill active" onclick="filterCat(this,'all')">All recipes</button>
     <button class="cat-pill" onclick="filterCat(this,'canning')">Canning & preserving</button>
@@ -281,22 +320,15 @@
 
   <div class="hero">
     <div class="hero-bg">
-      <svg viewBox="0 0 200 200" fill="none" aria-hidden="true">
-        <circle cx="100" cy="100" r="80" stroke="white" stroke-width="1"/>
-        <path d="M60 130 Q100 60 140 130" stroke="white" stroke-width="1" fill="none"/>
-        <circle cx="100" cy="80" r="12" fill="white"/>
-        <circle cx="70" cy="115" r="5" fill="white" opacity="0.4"/>
-        <circle cx="130" cy="115" r="5" fill="white" opacity="0.4"/>
-      </svg>
+      <svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="100" r="80" stroke="white" stroke-width="1"/><path d="M60 130 Q100 60 140 130" stroke="white" stroke-width="1" fill="none"/><circle cx="100" cy="80" r="12" fill="white"/></svg>
     </div>
-    <div class="hero-fade"></div>
-    <div class="hero-fade-bottom"></div>
+    <div class="hero-fade"></div><div class="hero-fade-bottom"></div>
     <div class="hero-content">
       <div class="hero-tag">✦ Featured this week</div>
       <h1 class="hero-title">Strawberry<br><em>Balsamic</em><br>Preserves</h1>
       <p class="hero-desc">Peak-season strawberries slow-cooked with aged balsamic and a whisper of black pepper. Perfect for water bath canning.</p>
       <div class="hero-actions">
-        <button class="btn-filled" onclick="showPage('recipe')">View recipe</button>
+        <button class="btn-filled" onclick="showPage('recipe');renderStaticRecipe();loadStaticComments()">View recipe</button>
         <button class="btn-bare">See all canning →</button>
       </div>
     </div>
@@ -304,9 +336,9 @@
       <div class="badge-label">Now trending</div>
       <div class="badge-title">Strawberry Balsamic Jam</div>
       <div class="badge-actions">
-        <button class="icon-btn" onclick="toggleLike('hero',this)">♡ <span>142</span></button>
-        <button class="icon-btn" onclick="shareRecipe('Strawberry Balsamic Preserves')">↗ Share</button>
-        <button class="icon-btn" onclick="saveRecipeBtn('hero',this)">🔖 Save</button>
+        <button class="icon-btn" onclick="handleLike('hero',this)"><i data-lucide="heart"></i> <span>142</span></button>
+        <button class="icon-btn" onclick="handleShare('Strawberry Balsamic Preserves')"><i data-lucide="share-2"></i> Share</button>
+        <button class="icon-btn" onclick="handleSave('hero',this)"><i data-lucide="bookmark"></i> Save</button>
       </div>
     </div>
   </div>
@@ -316,105 +348,7 @@
       <h2 class="section-title">Recent recipes</h2>
       <button class="section-link">Browse all →</button>
     </div>
-    <div class="recipe-grid" id="recipe-grid">
-
-      <article class="recipe-card" data-cat="mains" onclick="showPage('recipe')">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#D0DFC8,#B8D4AC);">🥔
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r1',this)">🔖</button>
-        </div>
-        <div class="r-meta">Mains · Vegan · 70 min</div>
-        <h3 class="r-title">Crispy Smashed Potatoes with Herby Vegan Ranch</h3>
-        <p class="r-desc">Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing and fresh cucumber.</p>
-        <div class="r-foot">
-          <span class="r-time">Serves 4</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r1',this)">♡ <span>34</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Crispy Smashed Potatoes')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="recipe-card" data-cat="canning">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#F5D5C0,#EAB898);">🍑
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r2',this)">🔖</button>
-        </div>
-        <div class="r-meta">Canning · 45 min</div>
-        <h3 class="r-title">Peach Vanilla Jam</h3>
-        <p class="r-desc">Sun-ripened peaches with Madagascar vanilla bean. One of the most requested preserves on the site.</p>
-        <div class="r-foot">
-          <span class="r-time">Makes 6 half-pints</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r2',this)">♡ <span>87</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Peach Vanilla Jam')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="recipe-card" data-cat="pickles">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#C8DCC0,#A8C898);">🥒
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r3',this)">🔖</button>
-        </div>
-        <div class="r-meta">Pickles · 30 min</div>
-        <h3 class="r-title">Garlic Dill Pickles</h3>
-        <p class="r-desc">Classic and crisp with plenty of fresh dill, whole garlic cloves, and a bold brine. Water bath safe.</p>
-        <div class="r-foot">
-          <span class="r-time">Makes 4 quarts</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r3',this)">♡ <span>204</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Garlic Dill Pickles')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="recipe-card" data-cat="sauces">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#E8C8B0,#D4A888);">🍅
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r4',this)">🔖</button>
-        </div>
-        <div class="r-meta">Sauces · 1 hr 20 min</div>
-        <h3 class="r-title">Roasted Tomato Salsa</h3>
-        <p class="r-desc">Charred Roma tomatoes, smoked jalapeños, and fresh cilantro. A pantry staple you'll reach for all winter.</p>
-        <div class="r-foot">
-          <span class="r-time">Makes 8 pints</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r4',this)">♡ <span>318</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Roasted Tomato Salsa')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="recipe-card" data-cat="baking">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#E0D4BC,#C8B898);">🍞
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r5',this)">🔖</button>
-        </div>
-        <div class="r-meta">Baking · 2 hrs</div>
-        <h3 class="r-title">Sourdough Focaccia</h3>
-        <p class="r-desc">Open-crumb, crispy-edged, dimpled with olive oil. Pairs beautifully with any of our pickled spreads.</p>
-        <div class="r-foot">
-          <span class="r-time">Serves 8</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r5',this)">♡ <span>91</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Sourdough Focaccia')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="recipe-card" data-cat="canning">
-        <div class="recipe-img" style="background:linear-gradient(135deg,#D4C8E0,#B8A8CC);">🫐
-          <button class="save-btn" onclick="event.stopPropagation();saveRecipeBtn('r6',this)">🔖</button>
-        </div>
-        <div class="r-meta">Canning · 50 min</div>
-        <h3 class="r-title">Blueberry Lavender Jam</h3>
-        <p class="r-desc">Floral and fragrant with fresh culinary lavender. An elegant jam that looks stunning in the jar.</p>
-        <div class="r-foot">
-          <span class="r-time">Makes 5 half-pints</span>
-          <div class="r-actions">
-            <button class="r-btn" onclick="event.stopPropagation();toggleLike('r6',this)">♡ <span>73</span></button>
-            <button class="r-btn" onclick="event.stopPropagation();shareRecipe('Blueberry Lavender Jam')">↗ share</button>
-          </div>
-        </div>
-      </article>
-
-    </div>
+    <div class="recipe-grid" id="recipe-grid"></div>
   </div>
 
   <div class="shop-teaser">
@@ -445,53 +379,51 @@
     </div>
   </div>
 
+  <div class="newsletter">
+    <div>
+      <div class="newsletter-label">✦ Stay in the loop</div>
+      <div class="newsletter-title">The Shindig Kitchen newsletter</div>
+      <div class="newsletter-desc">Seasonal recipes, canning tips, and shop updates — once a month.</div>
+    </div>
+    <div class="newsletter-form">
+      <input class="newsletter-input" type="email" id="nl-email" placeholder="your@email.com" />
+      <button class="btn-filled" onclick="subscribeNewsletter()">Subscribe</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-logo" onclick="showPage('home')">Shindig<em>Kitchen</em></div>
-    <div class="footer-links">
-      <a onclick="showPage('home')">Recipes</a>
-      <a>Canning guide</a>
-      <a>Shop</a>
-      <a>Newsletter</a>
-    </div>
+    <div class="footer-copy">© 2026 Shindig Kitchen</div>
     <div class="footer-social">
-      <button>Pinterest</button>
-      <button>Instagram</button>
-      <button>Facebook</button>
+      <a href="https://pinterest.com/shindigkitchen" target="_blank" title="Pinterest"><i data-lucide="image"></i></a>
+      <a href="https://instagram.com/shindigkitchen" target="_blank" title="Instagram"><i data-lucide="instagram"></i></a>
+      <a href="https://tiktok.com/@shindigkitchen" target="_blank" title="TikTok"><i data-lucide="music"></i></a>
+      <a href="https://twitter.com/shindigkitchen" target="_blank" title="Twitter"><i data-lucide="twitter"></i></a>
     </div>
   </footer>
+</div>
 
-</div><!-- end home page -->
-
-
-<!-- ============ RECIPE PAGE ============ -->
+<!-- RECIPE PAGE -->
 <div id="page-recipe" class="page">
   <div class="recipe-page-wrap">
-
     <div class="breadcrumb">
-      <a onclick="showPage('home')">Recipes</a>
-      <span class="breadcrumb-sep">›</span>
-      <a onclick="showPage('home')">Mains</a>
-      <span class="breadcrumb-sep">›</span>
-      <span>Crispy Smashed Potatoes with Herby Vegan Ranch</span>
+      <a onclick="showPage('home')">Recipes</a><span>›</span>
+      <a id="rp-cat-crumb" onclick="showPage('home')">—</a><span>›</span>
+      <span id="rp-title-crumb">—</span>
     </div>
-
-    <div class="recipe-hero-img">
-      <span class="recipe-hero-img-placeholder" style="font-size:5rem;">🥔</span>
-    </div>
-
+    <div class="recipe-hero-img" id="rp-hero">🍴</div>
     <div class="recipe-page-header">
       <div>
-        <div class="recipe-page-category">Mains · Vegan</div>
-        <h1 class="recipe-page-title">Crispy Smashed Potatoes<br>with Herby Vegan Ranch</h1>
-        <p class="recipe-page-desc">Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing and fresh cucumber. A side dish that tends to disappear fast.</p>
+        <div class="recipe-page-category" id="rp-category"></div>
+        <h1 class="recipe-page-title" id="rp-title">Loading...</h1>
+        <p class="recipe-page-desc" id="rp-desc"></p>
       </div>
       <div class="recipe-page-actions">
-        <button class="recipe-action-btn" id="rp-like" onclick="toggleLike('rp',this)">♡ <span id="rp-like-count">34</span> likes</button>
-        <button class="recipe-action-btn" id="rp-save" onclick="saveRecipeBtn('rp',this)">🔖 Save recipe</button>
-        <button class="recipe-action-btn" onclick="shareRecipe('Crispy Smashed Potatoes with Herby Vegan Ranch')">↗ Share</button>
+        <button class="recipe-action-btn" id="rp-like-btn" onclick="handleLike('rp',this)"><i data-lucide="heart"></i> <span id="rp-like-count">0</span> likes</button>
+        <button class="recipe-action-btn" id="rp-save-btn" onclick="handleSave('rp',this)"><i data-lucide="bookmark"></i> Save recipe</button>
+        <button class="recipe-action-btn" onclick="handleShare()"><i data-lucide="share-2"></i> Share</button>
       </div>
     </div>
-
     <div class="recipe-controls">
       <div class="ctrl-group">
         <span class="ctrl-label">Units</span>
@@ -511,226 +443,404 @@
         </select>
       </div>
       <div class="recipe-meta-row">
-        <div class="meta-stat"><span class="meta-stat-val">15 min</span><span class="meta-stat-label">Prep</span></div>
-        <div class="meta-stat"><span class="meta-stat-val">55 min</span><span class="meta-stat-label">Cook</span></div>
-        <div class="meta-stat"><span class="meta-stat-val">70 min</span><span class="meta-stat-label">Total</span></div>
+        <div class="meta-stat"><span class="meta-stat-val" id="rp-prep">—</span><span class="meta-stat-label">Prep</span></div>
+        <div class="meta-stat"><span class="meta-stat-val" id="rp-cook">—</span><span class="meta-stat-label">Cook</span></div>
+        <div class="meta-stat"><span class="meta-stat-val" id="rp-total">—</span><span class="meta-stat-label">Total</span></div>
       </div>
     </div>
-
     <div class="recipe-body">
-
-      <div>
-        <div class="ing-section-title">Ingredients</div>
-
-        <div class="ing-group-label">Potatoes</div>
-        <div class="ing-row"><span class="ing-name">Baby Yukon Gold potatoes</span><span class="ing-qty" id="i-potatoes">14 oz</span></div>
-        <div class="ing-row"><span class="ing-name">Olive oil spray</span><span class="ing-qty">as needed</span></div>
-        <div class="ing-row"><span class="ing-name">Salt & cracked black pepper</span><span class="ing-qty">to taste</span></div>
-
-        <div class="ing-group-label">Salad</div>
-        <div class="ing-row"><span class="ing-name">Persian cucumber, deseeded & diced</span><span class="ing-qty" id="i-cucumber">1</span></div>
-        <div class="ing-row"><span class="ing-name">Small red onion, finely chopped</span><span class="ing-qty" id="i-onion">1</span></div>
-
-        <div class="ing-group-label">Dressing</div>
-        <div class="ing-row"><span class="ing-name">Vegan Greek yogurt</span><span class="ing-qty" id="i-yogurt">¼ cup</span></div>
-        <div class="ing-row"><span class="ing-name">Vegan mayonnaise</span><span class="ing-qty" id="i-mayo">½ cup</span></div>
-        <div class="ing-row"><span class="ing-name">Garlic clove, minced</span><span class="ing-qty" id="i-garlic">1</span></div>
-        <div class="ing-row"><span class="ing-name">Dijon mustard</span><span class="ing-qty" id="i-dijon">1 tbsp</span></div>
-        <div class="ing-row"><span class="ing-name">Wholegrain mustard</span><span class="ing-qty" id="i-grain">1 tbsp</span></div>
-        <div class="ing-row"><span class="ing-name">Fresh dill, chopped</span><span class="ing-qty" id="i-dill">¼ cup</span></div>
-        <div class="ing-row"><span class="ing-name">Flat-leaf parsley, chopped</span><span class="ing-qty" id="i-parsley">3 tbsp</span></div>
-        <div class="ing-row"><span class="ing-name">Chives, chopped</span><span class="ing-qty" id="i-chives">3 tbsp</span></div>
-        <div class="ing-row"><span class="ing-name">Cracked black pepper</span><span class="ing-qty" id="i-pepper">¼ tsp</span></div>
-        <div class="ing-row"><span class="ing-name">Lemon, juiced</span><span class="ing-qty" id="i-lemon">1</span></div>
-      </div>
-
-      <div>
-        <div class="steps-section-title">Method</div>
-        <div class="step"><div class="step-n">1</div><div class="step-inner"><div class="step-title">Boil the potatoes</div><div class="step-text">Bring a large pot of well-salted water to a boil. Add the potatoes and cook until completely fork-tender, about 10–15 minutes depending on size. You want them soft all the way through — they'll crisp up in the oven. Drain and let steam-dry for a few minutes.</div></div></div>
-        <div class="step"><div class="step-n">2</div><div class="step-inner"><div class="step-title">Prep the salad</div><div class="step-text">While the potatoes cook, finely dice the cucumber and chop the red onion. Set aside in a bowl — you'll dress them later.</div></div></div>
-        <div class="step"><div class="step-n">3</div><div class="step-inner"><div class="step-title">Make the dressing</div><div class="step-text">Whisk together the yogurt, mayo, garlic, both mustards, dill, parsley, chives, pepper, and lemon juice until smooth and creamy. Taste and adjust salt as needed. Set aside — the flavors will keep developing as it sits.</div></div></div>
-        <div class="step"><div class="step-n">4</div><div class="step-inner"><div class="step-title">Smash and season</div><div class="step-text">Preheat your oven to 425°F (220°C). Arrange the drained potatoes in a single layer on a baking sheet. Using the flat bottom of a drinking glass, press each potato down firmly to about ¼ inch (6 mm) thick. Slide the glass off in a flat motion to avoid sticking. Spray generously with olive oil, season with salt and pepper, then spray once more.</div></div></div>
-        <div class="step"><div class="step-n">5</div><div class="step-inner"><div class="step-title">Roast until craggly and golden</div><div class="step-text">Roast for 40–50 minutes until deeply golden, crispy at the edges, and craggly on top. Don't rush this — the color is the flavor. No need to flip.</div></div></div>
-        <div class="step"><div class="step-n">6</div><div class="step-inner"><div class="step-title">Rest the potatoes, dress the salad</div><div class="step-text">Pull the potatoes from the oven and let them cool for 10 minutes — this keeps them crispy and stops the dressing from turning watery. While they rest, toss the cucumber and onion into the dressing bowl and combine.</div></div></div>
-        <div class="step"><div class="step-n">7</div><div class="step-inner"><div class="step-title">Toss and serve</div><div class="step-text">Add half the rested potatoes to the salad and toss gently — they'll break into uneven chunks, which is exactly what you want. Pile into a serving dish and scatter the remaining crispy potatoes over the top for texture. Serve straight away.</div></div></div>
-
-        <div class="recipe-notes">
-          <div class="recipe-notes-title">Cook's notes</div>
-          <div class="recipe-notes-text">Vegan by design, but works equally well with regular Greek yogurt and mayo if that's what you have. The dressing is also excellent as a dip for crudités or a spread on sandwiches — make a double batch and thank yourself later.</div>
-        </div>
-      </div>
+      <div><div class="ing-section-title">Ingredients</div><div id="rp-ingredients"></div></div>
+      <div><div class="steps-section-title">Method</div><div id="rp-steps"></div><div id="rp-notes"></div></div>
     </div>
-
-    <!-- COMMENTS -->
     <div class="comments-section">
-      <div class="comments-title">Comments <span style="font-size:1rem;color:var(--muted);font-family:var(--font-body);font-weight:400;">(2)</span></div>
-
+      <div class="comments-title">Comments <span id="rp-comment-count" style="font-size:1rem;color:var(--muted);font-family:var(--font-body);font-weight:400;"></span></div>
       <div class="comment-form">
-        <textarea placeholder="Share your experience with this recipe…" id="comment-input"></textarea>
+        <textarea id="comment-input" placeholder="Share your experience…"></textarea>
         <div class="comment-form-foot">
+          <div class="comment-login-note" id="comment-note"></div>
           <button class="btn-filled" onclick="postComment()">Post comment</button>
         </div>
       </div>
-
-      <div id="comments-list">
-        <div class="comment">
-          <div class="comment-avatar">ML</div>
-          <div class="comment-body">
-            <div class="comment-author">Marie L.</div>
-            <div class="comment-date">March 12, 2025</div>
-            <div class="comment-text">Made this for a dinner party last weekend and everyone went back for seconds. The dressing is absolutely addictive — I ended up making a double batch exactly as suggested. Will be on regular rotation.</div>
-            <button class="comment-like" onclick="this.textContent='♡ 4 likes'">♡ 3 likes</button>
-          </div>
-        </div>
-        <div class="comment">
-          <div class="comment-avatar">TK</div>
-          <div class="comment-body">
-            <div class="comment-author">Tom K.</div>
-            <div class="comment-date">February 28, 2025</div>
-            <div class="comment-text">The 10-minute rest tip is crucial — I skipped it the first time and the potatoes went soft immediately. Second attempt was perfect. Great recipe.</div>
-            <button class="comment-like">♡ 1 like</button>
-          </div>
-        </div>
-      </div>
+      <div id="comments-list"></div>
     </div>
-
-  </div><!-- end recipe-page-wrap -->
-
+  </div>
   <footer>
     <div class="footer-logo" onclick="showPage('home')">Shindig<em>Kitchen</em></div>
-    <div class="footer-links">
-      <a onclick="showPage('home')">Recipes</a>
-      <a>Canning guide</a>
-      <a>Shop</a>
-      <a>Newsletter</a>
-    </div>
+    <div class="footer-copy">© 2026 Shindig Kitchen</div>
     <div class="footer-social">
-      <button>Pinterest</button>
-      <button>Instagram</button>
-      <button>Facebook</button>
+      <a href="https://pinterest.com/shindigkitchen" target="_blank"><i data-lucide="image"></i></a>
+      <a href="https://instagram.com/shindigkitchen" target="_blank"><i data-lucide="instagram"></i></a>
+      <a href="https://tiktok.com/@shindigkitchen" target="_blank"><i data-lucide="music"></i></a>
+      <a href="https://twitter.com/shindigkitchen" target="_blank"><i data-lucide="twitter"></i></a>
     </div>
   </footer>
+</div>
 
-</div><!-- end recipe page -->
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-  // PAGE NAVIGATION
-  function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    window.scrollTo(0, 0);
-  }
+let currentUser = null, currentRecipe = null;
+let unit = 'imperial', portions = 4;
+const BASE = 4;
 
-  // SAVED / LIKED
-  const saved = new Set(), liked = new Set();
-  function updateSavedCount() { document.getElementById('saved-count').textContent = saved.size; }
-  function saveRecipeBtn(id, btn) {
-    if (saved.has(id)) { saved.delete(id); btn.classList.remove('saved'); }
-    else { saved.add(id); btn.classList.add('saved'); showToast('Recipe saved 🔖'); }
-    updateSavedCount();
-  }
-  function toggleLike(id, btn) {
-    const c = btn.querySelector('span'), n = parseInt(c.textContent);
-    if (liked.has(id)) { liked.delete(id); c.textContent = n - 1; btn.classList.remove('liked'); }
-    else { liked.add(id); c.textContent = n + 1; btn.classList.add('liked'); }
-  }
-  function shareRecipe(title) {
-    if (navigator.share) { navigator.share({ title: title + ' — Shindig Kitchen', url: window.location.href }); }
-    else { navigator.clipboard && navigator.clipboard.writeText(window.location.href); showToast('Link copied ✨'); }
-  }
-  function showToast(msg) {
-    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
+document.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons();
+  await checkSession();
+  await loadRecipes();
+  renderStaticRecipe();
+  loadStaticComments();
+});
 
-  // CATEGORY FILTER
-  function filterCat(btn, cat) {
-    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.recipe-card').forEach(c => {
-      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'block' : 'none';
-    });
+// AUTH
+async function checkSession() {
+  try {
+    const r = await fetch('/api/auth/me');
+    const d = await r.json();
+    if (d.user) { currentUser = d.user; updateNavAuth(); }
+  } catch(e) {}
+}
+
+function updateNavAuth() {
+  const el = document.getElementById('nav-auth-area');
+  if (currentUser) {
+    const i = (currentUser.username||'U').substring(0,2).toUpperCase();
+    el.innerHTML = `<div class="nav-user"><div class="nav-avatar">${i}</div><button class="nav-auth-btn" onclick="doLogout()">${currentUser.username}</button></div>`;
+  } else {
+    el.innerHTML = `<button class="nav-auth-btn" onclick="openModal()">Sign in</button>`;
   }
+  updateCommentForm();
+}
 
-  // UNIT + PORTIONS
-  let unit = 'imperial', portions = 4;
-  const BASE = 4;
+async function doLogout() {
+  await fetch('/api/auth/logout', { method:'POST' });
+  currentUser = null; updateNavAuth(); showToast('Signed out');
+}
 
-  function frac(n) {
-    const map = {0.125:'⅛',0.25:'¼',0.333:'⅓',0.5:'½',0.667:'⅔',0.75:'¾'};
-    const whole = Math.floor(n), rem = parseFloat((n - whole).toFixed(3));
-    const f = map[rem] || '';
-    if (whole === 0) return f || n.toFixed(1);
-    return f ? whole + ' ' + f : whole.toString();
-  }
+function openModal() { document.getElementById('auth-modal').classList.add('open'); document.getElementById('auth-error').textContent=''; }
+function closeModal() { document.getElementById('auth-modal').classList.remove('open'); }
+function requireAuth() { if (!currentUser) { openModal(); return false; } return true; }
 
-  const ING = {
-    potatoes: { imp: [3.5,'oz'], met: [100,'g'] },
-    yogurt:   { imp: [0.0625,'cup'], met: [60,'ml']  },
-    mayo:     { imp: [0.125,'cup'],  met: [120,'ml'] },
-    dijon:    { imp: [0.25,'tbsp'],  met: [15,'ml']  },
-    grain:    { imp: [0.25,'tbsp'],  met: [15,'ml']  },
-    dill:     { imp: [0.0625,'cup'], met: [60,'ml']  },
-    parsley:  { imp: [0.75,'tbsp'],  met: [45,'ml']  },
-    chives:   { imp: [0.75,'tbsp'],  met: [45,'ml']  },
-    pepper:   { imp: [0.0625,'tsp'], met: [1.25,'ml']},
-    cucumber: { count: true, base: 1 },
-    onion:    { count: true, base: 1 },
-    garlic:   { count: true, base: 1 },
-    lemon:    { count: true, base: 1 },
-  };
+function switchTab(t) {
+  document.querySelectorAll('.modal-tab').forEach((el,i) => el.classList.toggle('active', (t==='login'&&i===0)||(t==='register'&&i===1)));
+  document.getElementById('form-login').classList.toggle('active', t==='login');
+  document.getElementById('form-register').classList.toggle('active', t==='register');
+  document.getElementById('auth-error').textContent='';
+}
 
-  function renderIngredients() {
-    const ratio = portions / BASE;
-    for (const [key, data] of Object.entries(ING)) {
-      const el = document.getElementById('i-' + key);
-      if (!el) continue;
-      if (data.count) {
-        const n = Math.round((data.base / BASE) * portions * 2) / 2;
-        el.textContent = n % 1 === 0 ? n : n.toFixed(1);
-        continue;
-      }
-      if (unit === 'imperial') {
-        const [perServing, u] = data.imp;
-        const scaled = perServing * portions;
-        if (u === 'oz' && scaled >= 16) { el.textContent = (scaled / 16).toFixed(1).replace(/\.0$/,'') + ' lb'; }
-        else if (u === 'oz') { el.textContent = Math.round(scaled) + ' oz'; }
-        else { el.textContent = frac(scaled) + ' ' + u; }
-      } else {
-        const [baseAmt, u] = data.met;
-        const scaled = baseAmt * ratio;
-        el.textContent = (u === 'g' || u === 'ml') ? Math.round(scaled) + ' ' + u : frac(scaled) + ' ' + u;
-      }
+async function submitLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-password').value;
+  document.getElementById('auth-error').textContent='';
+  try {
+    const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+    const d = await res.json();
+    if (!res.ok) { document.getElementById('auth-error').textContent=d.error; return; }
+    currentUser=d.user; updateNavAuth(); closeModal(); showToast('Welcome back, '+currentUser.username+'!');
+  } catch(e) { document.getElementById('auth-error').textContent='Connection error.'; }
+}
+
+async function submitRegister() {
+  const display_name=document.getElementById('r-dname').value.trim();
+  const username=document.getElementById('r-uname').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const password=document.getElementById('r-pass').value;
+  document.getElementById('auth-error').textContent='';
+  try {
+    const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({display_name,username,email,password}) });
+    const d = await res.json();
+    if (!res.ok) { document.getElementById('auth-error').textContent=d.error; return; }
+    currentUser=d.user; updateNavAuth(); closeModal(); showToast('Welcome to Shindig Kitchen!');
+  } catch(e) { document.getElementById('auth-error').textContent='Connection error.'; }
+}
+
+// RECIPES
+async function loadRecipes(category='') {
+  const grid = document.getElementById('recipe-grid');
+  try {
+    const res = await fetch('/api/recipes'+(category?'?category='+category:''));
+    const d = await res.json();
+    if (d.recipes && d.recipes.length) {
+      grid.innerHTML = d.recipes.map(recipeCardHTML).join('');
+      lucide.createIcons(); return;
     }
+  } catch(e) {}
+  grid.innerHTML = staticCards();
+  lucide.createIcons();
+}
+
+function recipeCardHTML(r) {
+  const img = r.image_url ? `<img src="${r.image_url}" alt="${r.title}" loading="lazy"/>` : '🍴';
+  const time = (r.prep_time&&r.cook_time) ? (r.prep_time+r.cook_time)+' min' : '';
+  return `<article class="recipe-card" data-cat="${r.category_slug||''}" onclick="openRecipe('${r.slug}')">
+    <div class="recipe-img">${img}<button class="save-btn" onclick="event.stopPropagation();handleSave(${r.id},this)"><i data-lucide="bookmark"></i></button></div>
+    <div class="r-meta">${r.category_name||''}${r.is_vegan?' · Vegan':''}${time?' · '+time:''}</div>
+    <h3 class="r-title">${r.title}</h3>
+    <p class="r-desc">${r.description||''}</p>
+    <div class="r-foot"><span class="r-time">${r.base_servings?'Serves '+r.base_servings:''}</span>
+      <div class="r-actions">
+        <button class="r-btn" onclick="event.stopPropagation();handleLike(${r.id},this)"><i data-lucide="heart"></i> <span>${r.like_count||0}</span></button>
+        <button class="r-btn" onclick="event.stopPropagation();handleShare('${r.title}')"><i data-lucide="share-2"></i></button>
+      </div>
+    </div>
+  </article>`;
+}
+
+const STATIC_CARDS = [
+  {cat:'mains',e:'🥔',meta:'Mains · Vegan · 70 min',title:'Crispy Smashed Potatoes with Herby Vegan Ranch',desc:'Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing.',time:'Serves 4',slug:'crispy-smashed-potatoes'},
+  {cat:'canning',e:'🍑',meta:'Canning · 45 min',title:'Peach Vanilla Jam',desc:'Sun-ripened peaches with Madagascar vanilla bean.',time:'Makes 6 half-pints',slug:''},
+  {cat:'pickles',e:'🥒',meta:'Pickles · 30 min',title:'Garlic Dill Pickles',desc:'Classic and crisp with plenty of fresh dill, whole garlic cloves, and a bold brine.',time:'Makes 4 quarts',slug:''},
+  {cat:'sauces',e:'🍅',meta:'Sauces · 1 hr 20 min',title:'Roasted Tomato Salsa',desc:'Charred Roma tomatoes, smoked jalapeños, and fresh cilantro.',time:'Makes 8 pints',slug:''},
+  {cat:'baking',e:'🍞',meta:'Baking · 2 hrs',title:'Sourdough Focaccia',desc:'Open-crumb, crispy-edged, dimpled with olive oil.',time:'Serves 8',slug:''},
+  {cat:'canning',e:'🫐',meta:'Canning · 50 min',title:'Blueberry Lavender Jam',desc:'Floral and fragrant with fresh culinary lavender.',time:'Makes 5 half-pints',slug:''},
+];
+
+function staticCards() {
+  return STATIC_CARDS.map(c=>`<article class="recipe-card" data-cat="${c.cat}" onclick="${c.slug?`openRecipe('${c.slug}')`:'void(0)'}">
+    <div class="recipe-img" style="font-size:3rem;">${c.e}<button class="save-btn" onclick="event.stopPropagation();handleSave(null,this)"><i data-lucide="bookmark"></i></button></div>
+    <div class="r-meta">${c.meta}</div><h3 class="r-title">${c.title}</h3><p class="r-desc">${c.desc}</p>
+    <div class="r-foot"><span class="r-time">${c.time}</span>
+      <div class="r-actions">
+        <button class="r-btn" onclick="event.stopPropagation();handleLike(null,this)"><i data-lucide="heart"></i> <span>0</span></button>
+        <button class="r-btn" onclick="event.stopPropagation();handleShare('${c.title}')"><i data-lucide="share-2"></i></button>
+      </div>
+    </div>
+  </article>`).join('');
+}
+
+async function openRecipe(slug) {
+  showPage('recipe');
+  try {
+    const res = await fetch('/api/recipes/'+slug);
+    const d = await res.json();
+    if (d.recipe) { currentRecipe=d.recipe; renderRecipePage(d.recipe); loadComments(d.recipe.id); return; }
+  } catch(e) {}
+  renderStaticRecipe(); loadStaticComments();
+}
+
+function renderRecipePage(r) {
+  currentRecipe = r;
+  document.getElementById('rp-title').textContent = r.title;
+  document.getElementById('rp-title-crumb').textContent = r.title;
+  document.getElementById('rp-cat-crumb').textContent = r.category_name||'Recipes';
+  document.getElementById('rp-category').textContent = (r.category_name||'')+(r.is_vegan?' · Vegan':'');
+  document.getElementById('rp-desc').textContent = r.description||'';
+  document.getElementById('rp-like-count').textContent = r.like_count||0;
+  document.getElementById('rp-prep').textContent = r.prep_time ? r.prep_time+' min' : '—';
+  document.getElementById('rp-cook').textContent = r.cook_time ? r.cook_time+' min' : '—';
+  document.getElementById('rp-total').textContent = (r.prep_time&&r.cook_time) ? (r.prep_time+r.cook_time)+' min' : '—';
+  const hero = document.getElementById('rp-hero');
+  hero.innerHTML = r.image_url ? `<img src="${r.image_url}" alt="${r.title}"/>` : '🍴';
+  const ings = Array.isArray(r.ingredients) ? r.ingredients : JSON.parse(r.ingredients||'[]');
+  const stps = Array.isArray(r.steps) ? r.steps : JSON.parse(r.steps||'[]');
+  renderIngs(ings); renderSteps(stps);
+  document.getElementById('rp-notes').innerHTML = r.notes ? `<div class="recipe-notes"><div class="recipe-notes-title">Cook's notes</div><div class="recipe-notes-text">${r.notes}</div></div>` : '';
+  lucide.createIcons();
+}
+
+// STATIC RECIPE DATA
+const STATIC_INGS = [
+  {group:'Potatoes',items:[{name:'Baby Yukon Gold potatoes',imp:[3.5,'oz'],met:[100,'g']},{name:'Olive oil spray',fixed:'as needed'},{name:'Salt & cracked black pepper',fixed:'to taste'}]},
+  {group:'Salad',items:[{name:'Persian cucumber, deseeded & diced',count:1},{name:'Small red onion, finely chopped',count:1}]},
+  {group:'Dressing',items:[
+    {name:'Vegan Greek yogurt',imp:[0.0625,'cup'],met:[60,'ml']},
+    {name:'Vegan mayonnaise',imp:[0.125,'cup'],met:[120,'ml']},
+    {name:'Garlic clove, minced',count:1},
+    {name:'Dijon mustard',imp:[0.25,'tbsp'],met:[15,'ml']},
+    {name:'Wholegrain mustard',imp:[0.25,'tbsp'],met:[15,'ml']},
+    {name:'Fresh dill, chopped',imp:[0.0625,'cup'],met:[60,'ml']},
+    {name:'Flat-leaf parsley, chopped',imp:[0.75,'tbsp'],met:[45,'ml']},
+    {name:'Chives, chopped',imp:[0.75,'tbsp'],met:[45,'ml']},
+    {name:'Cracked black pepper',imp:[0.0625,'tsp'],met:[1.25,'ml']},
+    {name:'Lemon, juiced',count:1},
+  ]}
+];
+
+const STATIC_STEPS = [
+  {title:'Boil the potatoes',text:'Bring a large pot of well-salted water to a boil. Add the potatoes and cook until completely fork-tender, about 10–15 minutes. Drain and let steam-dry for a few minutes.'},
+  {title:'Prep the salad',text:'While the potatoes cook, finely dice the cucumber and chop the red onion. Set aside in a bowl — you\'ll dress them later.'},
+  {title:'Make the dressing',text:'Whisk together the yogurt, mayo, garlic, both mustards, dill, parsley, chives, pepper, and lemon juice until smooth and creamy. Taste and adjust salt as needed.'},
+  {title:'Smash and season',text:'Preheat your oven to 425°F (220°C). Press each potato flat with the bottom of a glass — about ¼ inch thick. Spray generously with olive oil, season, and spray once more.'},
+  {title:'Roast until craggly and golden',text:'Roast for 40–50 minutes until deeply golden and crispy at the edges. Don\'t rush this — the color is the flavor. No need to flip.'},
+  {title:'Rest the potatoes, dress the salad',text:'Let the potatoes cool for 10 minutes — this keeps them crispy and stops the dressing from turning watery. Toss the cucumber and onion into the dressing bowl.'},
+  {title:'Toss and serve',text:'Add half the rested potatoes to the salad and toss gently. Pile into a serving dish and scatter the remaining crispy potatoes over the top. Serve straight away.'},
+];
+
+function renderStaticRecipe() {
+  currentRecipe = null;
+  document.getElementById('rp-title').textContent = 'Crispy Smashed Potatoes with Herby Vegan Ranch';
+  document.getElementById('rp-title-crumb').textContent = 'Crispy Smashed Potatoes';
+  document.getElementById('rp-cat-crumb').textContent = 'Mains';
+  document.getElementById('rp-category').textContent = 'Mains · Vegan';
+  document.getElementById('rp-desc').textContent = 'Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing and fresh cucumber. A side dish that tends to disappear fast.';
+  document.getElementById('rp-like-count').textContent = '34';
+  document.getElementById('rp-prep').textContent = '15 min';
+  document.getElementById('rp-cook').textContent = '55 min';
+  document.getElementById('rp-total').textContent = '70 min';
+  document.getElementById('rp-hero').innerHTML = '🥔';
+  renderIngs(STATIC_INGS); renderSteps(STATIC_STEPS);
+  document.getElementById('rp-notes').innerHTML = `<div class="recipe-notes"><div class="recipe-notes-title">Cook's notes</div><div class="recipe-notes-text">Vegan by design, but works equally well with regular Greek yogurt and mayo. The dressing is also excellent as a dip for crudités — make a double batch and thank yourself later.</div></div>`;
+  lucide.createIcons();
+}
+
+// INGREDIENT RENDERING
+function frac(n) {
+  const m={0.125:'⅛',0.25:'¼',0.333:'⅓',0.5:'½',0.667:'⅔',0.75:'¾'};
+  const w=Math.floor(n), r=parseFloat((n-w).toFixed(3)), f=m[r]||'';
+  if (w===0) return f||n.toFixed(1);
+  return f ? w+' '+f : String(w);
+}
+
+function scaleIng(ing) {
+  const ratio = portions/BASE;
+  if (ing.fixed) return ing.fixed;
+  if (ing.count!==undefined) { const n=Math.round((ing.count/BASE)*portions*2)/2; return n%1===0?String(n):n.toFixed(1); }
+  if (unit==='imperial') {
+    const [ps,u]=ing.imp, s=ps*portions;
+    if (u==='oz'&&s>=16) return (s/16).toFixed(1).replace(/\.0$/,'')+' lb';
+    if (u==='oz') return Math.round(s)+' oz';
+    return frac(s)+' '+u;
+  } else {
+    const [b,u]=ing.met, s=b*ratio;
+    return (u==='g'||u==='ml') ? Math.round(s)+' '+u : frac(s)+' '+u;
   }
+}
 
-  function setUnit(u) {
-    unit = u;
-    document.getElementById('btn-imp').classList.toggle('active', u === 'imperial');
-    document.getElementById('btn-met').classList.toggle('active', u === 'metric');
-    renderIngredients();
+function renderIngs(ings) {
+  const el=document.getElementById('rp-ingredients');
+  if (!ings||!ings.length){el.innerHTML='';return;}
+  if (ings[0]&&ings[0].group) {
+    el.innerHTML=ings.map(g=>`<div class="ing-group-label">${g.group}</div>${g.items.map(i=>`<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-qty">${scaleIng(i)}</span></div>`).join('')}`).join('');
+  } else {
+    el.innerHTML=ings.map(i=>`<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-qty">${i.amount?frac(parseFloat(i.amount)*portions/BASE)+(i.unit?' '+i.unit:''):''}</span></div>`).join('');
   }
+}
 
-  function setPortions(p) { portions = p; renderIngredients(); }
+function renderSteps(stps) {
+  const el=document.getElementById('rp-steps');
+  if (!stps||!stps.length){el.innerHTML='';return;}
+  el.innerHTML=stps.map((s,i)=>`<div class="step"><div class="step-n">${i+1}</div><div><div class="step-title">${s.title||''}</div><div class="step-text">${s.text||s.content||''}</div></div></div>`).join('');
+}
 
-  // COMMENTS
-  function postComment() {
-    const input = document.getElementById('comment-input');
-    const text = input.value.trim();
-    if (!text) return;
-    const list = document.getElementById('comments-list');
-    const div = document.createElement('div');
-    div.className = 'comment';
-    div.innerHTML = `<div class="comment-avatar">You</div><div class="comment-body"><div class="comment-author">You</div><div class="comment-date">Just now</div><div class="comment-text">${text}</div><button class="comment-like">♡ 0 likes</button></div>`;
-    list.prepend(div);
-    input.value = '';
-    showToast('Comment posted ✓');
+function setUnit(u) {
+  unit=u;
+  document.getElementById('btn-imp').classList.toggle('active',u==='imperial');
+  document.getElementById('btn-met').classList.toggle('active',u==='metric');
+  const ings=currentRecipe?(Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]')):STATIC_INGS;
+  renderIngs(ings);
+}
+
+function setPortions(p) {
+  portions=p;
+  const ings=currentRecipe?(Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]')):STATIC_INGS;
+  renderIngs(ings);
+}
+
+// COMMENTS
+async function loadComments(recipeId) {
+  try {
+    const res=await fetch('/api/comments/'+recipeId);
+    const d=await res.json();
+    document.getElementById('rp-comment-count').textContent=`(${(d.comments||[]).length})`;
+    const list=document.getElementById('comments-list');
+    if (!d.comments||!d.comments.length){list.innerHTML='<p style="font-size:0.85rem;color:var(--muted);">No comments yet. Be the first!</p>';return;}
+    list.innerHTML=d.comments.map(c=>{
+      const init=(c.display_name||c.username||'U').substring(0,2).toUpperCase();
+      const date=new Date(c.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+      return `<div class="comment"><div class="comment-avatar">${init}</div><div class="comment-body"><div class="comment-author">${c.display_name||c.username}</div><div class="comment-date">${date}</div><div class="comment-text">${c.body}</div><button class="comment-like-btn"><i data-lucide="heart"></i> ${c.like_count} likes</button></div></div>`;
+    }).join('');
+    lucide.createIcons();
+  } catch(e) { loadStaticComments(); }
+  updateCommentForm();
+}
+
+function loadStaticComments() {
+  document.getElementById('rp-comment-count').textContent='(2)';
+  document.getElementById('comments-list').innerHTML=[
+    {i:'ML',a:'Marie L.',d:'March 12, 2025',t:'Made this for a dinner party and everyone went back for seconds. The dressing is absolutely addictive — I made a double batch exactly as suggested.',l:3},
+    {i:'TK',a:'Tom K.',d:'February 28, 2025',t:'The 10-minute rest tip is crucial — I skipped it the first time and the potatoes went soft. Second attempt was perfect.',l:1},
+  ].map(c=>`<div class="comment"><div class="comment-avatar">${c.i}</div><div class="comment-body"><div class="comment-author">${c.a}</div><div class="comment-date">${c.d}</div><div class="comment-text">${c.t}</div><button class="comment-like-btn"><i data-lucide="heart"></i> ${c.l} likes</button></div></div>`).join('');
+  lucide.createIcons();
+  updateCommentForm();
+}
+
+function updateCommentForm() {
+  const note=document.getElementById('comment-note');
+  const input=document.getElementById('comment-input');
+  if (!currentUser) {
+    note.innerHTML='<a onclick="openModal()">Sign in</a> to leave a comment.';
+    input.disabled=true; input.placeholder='Sign in to comment...';
+  } else {
+    note.innerHTML=''; input.disabled=false; input.placeholder='Share your experience with this recipe…';
   }
+}
 
-  renderIngredients();
+async function postComment() {
+  if (!requireAuth()) return;
+  const body=document.getElementById('comment-input').value.trim();
+  if (!body) return;
+  if (!currentRecipe) {
+    const init=(currentUser.username||'U').substring(0,2).toUpperCase();
+    document.getElementById('comments-list').insertAdjacentHTML('afterbegin',`<div class="comment"><div class="comment-avatar">${init}</div><div class="comment-body"><div class="comment-author">${currentUser.username}</div><div class="comment-date">Just now</div><div class="comment-text">${body}</div><button class="comment-like-btn"><i data-lucide="heart"></i> 0 likes</button></div></div>`);
+    document.getElementById('comment-input').value='';
+    lucide.createIcons(); showToast('Comment posted ✓'); return;
+  }
+  try {
+    const res=await fetch('/api/comments/'+currentRecipe.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body})});
+    if (res.ok){document.getElementById('comment-input').value='';loadComments(currentRecipe.id);showToast('Comment posted ✓');}
+  } catch(e){}
+}
+
+// INTERACTIONS
+async function handleLike(id, btn) {
+  if (!requireAuth()) return;
+  btn.classList.toggle('active');
+  const c=btn.querySelector('span');
+  if (c) c.textContent=Math.max(0,parseInt(c.textContent||0)+(btn.classList.contains('active')?1:-1));
+  if (currentRecipe&&id==='rp') await fetch('/api/recipes/'+currentRecipe.id+'/like',{method:'POST'}).catch(()=>{});
+}
+
+async function handleSave(id, btn) {
+  if (!requireAuth()) return;
+  btn.classList.toggle('active');
+  const cnt=document.getElementById('saved-count');
+  cnt.textContent=Math.max(0,parseInt(cnt.textContent||0)+(btn.classList.contains('active')?1:-1));
+  showToast(btn.classList.contains('active')?'Recipe saved 🔖':'Recipe unsaved');
+  if (currentRecipe&&id==='rp') await fetch('/api/recipes/'+currentRecipe.id+'/save',{method:'POST'}).catch(()=>{});
+}
+
+function handleShare(title) {
+  const t=title||(currentRecipe?currentRecipe.title:'Shindig Kitchen');
+  if (navigator.share){navigator.share({title:t+' — Shindig Kitchen',url:window.location.href});}
+  else{navigator.clipboard&&navigator.clipboard.writeText(window.location.href);showToast('Link copied ✨');}
+}
+
+// NEWSLETTER
+function subscribeNewsletter() {
+  const email=document.getElementById('nl-email').value.trim();
+  if (!email||!email.includes('@')){showToast('Please enter a valid email');return;}
+  // TODO: replace with MailerLite embed or API call
+  showToast('Thanks for subscribing! 🌿');
+  document.getElementById('nl-email').value='';
+}
+
+// NAVIGATION
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  loadRecipes(cat==='all'?'':cat);
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 </script>
-
 </body>
 </html>

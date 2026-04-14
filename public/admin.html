@@ -182,6 +182,9 @@
         <div class="nav-item" onclick="showSection('comments')">
           <span class="nav-item-icon">💬</span> Comments
         </div>
+        <div class="nav-item" onclick="showSection('menu')">
+          <span class="nav-item-icon">☰</span> Navigation menu
+        </div>
       </nav>
       <div class="sidebar-footer">
         <div class="sidebar-user" id="sidebar-user">—</div>
@@ -429,6 +432,63 @@
         </div>
       </div>
 
+      <!-- MENU MANAGEMENT -->
+      <div id="section-menu" class="admin-section">
+        <div class="page-title">Navigation menu</div>
+        <div class="page-sub">Add, edit or reorder the links that appear in the site navigation. You can link to recipe categories, custom pages, tools like conversion charts, or external URLs.</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Menu items</div>
+            <button class="btn btn-sm btn-green" onclick="showMenuForm()">+ Add item</button>
+          </div>
+          <div id="menu-table-body"><div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">Loading...</div></div>
+        </div>
+        <div id="menu-form" style="display:none;margin-top:1.5rem;">
+          <div class="editor-card">
+            <div class="editor-card-title" id="menu-form-title">New menu item</div>
+            <input type="hidden" id="m-id" />
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Label *</label>
+                <input class="form-input" id="m-label" placeholder="e.g. Conversion Charts" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">URL *</label>
+                <input class="form-input" id="m-url" placeholder="e.g. /tools/conversions" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Page type</label>
+                <select class="form-input form-select" id="m-type">
+                  <option value="recipes">Recipes</option>
+                  <option value="category">Category</option>
+                  <option value="shop">Shop</option>
+                  <option value="tool">Tool / Reference</option>
+                  <option value="guide">Guide</option>
+                  <option value="external">External link</option>
+                  <option value="custom">Custom page</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Position (order)</label>
+                <input class="form-input" type="number" id="m-pos" placeholder="1" value="99" />
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-check">
+                <input type="checkbox" id="m-active" checked /> Visible in navigation
+              </label>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary btn-sm" onclick="saveMenuItem()">Save item</button>
+              <button class="btn btn-sm btn-outline" onclick="document.getElementById('menu-form').style.display='none'">Cancel</button>
+              <button class="btn btn-sm btn-danger" id="m-delete-btn" style="display:none;" onclick="deleteMenuItem()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -490,6 +550,7 @@
     if (name === 'orders') loadOrders();
     if (name === 'products') loadProducts();
     if (name === 'comments') loadComments();
+    if (name === 'menu') loadMenuItems();
   }
 
   // DASHBOARD
@@ -856,7 +917,82 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  checkSession();
+  // MENU
+  async function loadMenuItems() {
+    const res = await fetch('/api/menu');
+    const data = await res.json();
+    const el = document.getElementById('menu-table-body');
+    if (!data.items || !data.items.length) {
+      el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No menu items yet.</div>';
+      return;
+    }
+    el.innerHTML = `<table><thead><tr><th>Position</th><th>Label</th><th>URL</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead><tbody>${
+      data.items.map(m => `<tr>
+        <td style="color:var(--muted);">${m.position}</td>
+        <td><strong>${m.label}</strong></td>
+        <td style="font-size:0.8rem;color:var(--muted);">${m.url||'—'}</td>
+        <td><span class="badge badge-gray">${m.page_type||'—'}</span></td>
+        <td><span class="badge ${m.is_active?'badge-green':'badge-gray'}">${m.is_active?'Visible':'Hidden'}</span></td>
+        <td><button class="btn btn-sm btn-outline" onclick="editMenuItem(${JSON.stringify(m).replace(/"/g,'&quot;')})">Edit</button></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function showMenuForm() {
+    document.getElementById('m-id').value = '';
+    document.getElementById('m-label').value = '';
+    document.getElementById('m-url').value = '';
+    document.getElementById('m-type').value = 'custom';
+    document.getElementById('m-pos').value = '99';
+    document.getElementById('m-active').checked = true;
+    document.getElementById('m-delete-btn').style.display = 'none';
+    document.getElementById('menu-form-title').textContent = 'New menu item';
+    document.getElementById('menu-form').style.display = 'block';
+    document.getElementById('menu-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function editMenuItem(m) {
+    document.getElementById('m-id').value = m.id;
+    document.getElementById('m-label').value = m.label;
+    document.getElementById('m-url').value = m.url || '';
+    document.getElementById('m-type').value = m.page_type || 'custom';
+    document.getElementById('m-pos').value = m.position;
+    document.getElementById('m-active').checked = m.is_active;
+    document.getElementById('m-delete-btn').style.display = 'inline-flex';
+    document.getElementById('menu-form-title').textContent = 'Edit menu item';
+    document.getElementById('menu-form').style.display = 'block';
+    document.getElementById('menu-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function saveMenuItem() {
+    const id = document.getElementById('m-id').value;
+    const body = {
+      label: document.getElementById('m-label').value,
+      url: document.getElementById('m-url').value,
+      page_type: document.getElementById('m-type').value,
+      position: parseInt(document.getElementById('m-pos').value) || 99,
+      is_active: document.getElementById('m-active').checked,
+    };
+    if (!body.label) { showToast('Label is required', 'error'); return; }
+    const url = id ? `/api/menu/${id}` : '/api/menu';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (res.ok) {
+      showToast('Menu item saved ✓', 'success');
+      document.getElementById('menu-form').style.display = 'none';
+      loadMenuItems();
+    } else { showToast('Error saving item', 'error'); }
+  }
+
+  async function deleteMenuItem() {
+    const id = document.getElementById('m-id').value;
+    if (!id || !confirm('Delete this menu item?')) return;
+    await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+    showToast('Item deleted', 'success');
+    document.getElementById('menu-form').style.display = 'none';
+    loadMenuItems();
+  }
+
 </script>
 
 </body>

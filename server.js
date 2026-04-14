@@ -4,6 +4,7 @@ const session = require('express-session');
 const path = require('path');
 const { pool } = require('./db/pool');
 
+const menuRoutes = require('./routes/menu');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const commentRoutes = require('./routes/comments');
@@ -30,12 +31,33 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use('/api/menu', menuRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+
+app.get('/setup-admin', async (req, res) => {
+  const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME, ADMIN_DISPLAY_NAME } = process.env;
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    return res.send('Missing ADMIN_EMAIL or ADMIN_PASSWORD environment variables.');
+  }
+  try {
+    const bcrypt = require('bcryptjs');
+    const hash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+    await pool.query(
+      `INSERT INTO users (email, username, password, display_name, role)
+       VALUES ($1, $2, $3, $4, 'admin')
+       ON CONFLICT (email) DO UPDATE SET password=$3, role='admin'`,
+      [ADMIN_EMAIL, ADMIN_USERNAME || 'admin', hash, ADMIN_DISPLAY_NAME || 'Admin']
+    );
+    res.send('Admin account created successfully. You can now log in at /admin — delete the ADMIN_PASSWORD variable from Railway for security.');
+  } catch (err) {
+    res.send('Error: ' + err.message);
+  }
+});
 
 app.get('/recipe/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'recipe.html'));

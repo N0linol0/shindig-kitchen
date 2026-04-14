@@ -136,3 +136,22 @@ CREATE INDEX IF NOT EXISTS idx_recipes_featured ON recipes(featured);
 CREATE INDEX IF NOT EXISTS idx_comments_recipe ON comments(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+
+-- MENU ITEMS
+CREATE TABLE IF NOT EXISTS menu_items (
+  id          SERIAL PRIMARY KEY,
+  label       VARCHAR(100) NOT NULL,
+  url         VARCHAR(255),
+  page_type   VARCHAR(50),
+  position    INTEGER DEFAULT 0,
+  is_active   BOOLEAN DEFAULT TRUE,
+  parent_id   INTEGER REFERENCES menu_items(id),
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO menu_items (label, url, page_type, position) VALUES
+  ('Recipes', '/recipes', 'recipes', 1),
+  ('Canning', '/canning', 'category', 2),
+  ('Seasonal', '/seasonal', 'category', 3),
+  ('Shop', '/shop', 'shop', 4)
+ON CONFLICT DO NOTHING;
