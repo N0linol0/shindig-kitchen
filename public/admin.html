@@ -167,9 +167,6 @@
         <div class="nav-item active" onclick="showSection('dashboard')">
           <span class="nav-item-icon">◈</span> Dashboard
         </div>
-        <div class="nav-item" onclick="showSection('users')">
-          <span class="nav-item-icon">👤</span> Users
-        </div>
         <div class="nav-item" onclick="showSection('homepage')">
           <span class="nav-item-icon">🏠</span> Homepage editor
         </div>
@@ -912,9 +909,10 @@
     document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('section-' + name).classList.add('active');
-    const navMap = { dashboard:0, homepage:1, menu:2, contentstrip:3, recipes:4, articles:5, comments:6, users:7, products:8, orders:9 };
-    const items = document.querySelectorAll('.nav-item');
-    if (navMap[name] !== undefined) items[navMap[name]].classList.add('active');
+    // Highlight the nav item whose onclick matches the section name
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') === `showSection('${name}')`) n.classList.add('active');
+    });
     if (name === 'recipes') loadRecipes();
     if (name === 'orders') loadOrders();
     if (name === 'products') loadProducts();
@@ -923,7 +921,6 @@
     if (name === 'homepage') loadHomepageSections();
     if (name === 'contentstrip') loadContentStrip();
     if (name === 'articles') loadArticles();
-    if (name === 'users') loadUsers();
     if (name === 'users') loadUsers();
   }
 
