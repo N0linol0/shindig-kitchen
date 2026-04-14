@@ -959,26 +959,38 @@
   }
 
   // RECIPES
+  let _recipesCache = {};
+
   async function loadRecipes() {
     const res = await fetch('/api/admin/recipes');
+    if (!res.ok) { console.error('loadRecipes failed', res.status); return; }
     const data = await res.json();
     const el = document.getElementById('recipes-table-body');
     if (!data.recipes || !data.recipes.length) {
       el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">No recipes yet. <a href="#" onclick="newRecipe()" style="color:var(--accent);">Add your first one →</a></div>';
       return;
     }
+    // Cache recipes by id so editRecipe can look them up without inline JSON
+    _recipesCache = {};
+    data.recipes.forEach(r => { _recipesCache[r.id] = r; });
     el.innerHTML = `<table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Likes</th><th>Actions</th></tr></thead><tbody>${
       data.recipes.map(r => `<tr>
         <td><strong>${r.title}</strong></td>
         <td>${r.category_name || '—'}</td>
-        <td><span class="badge ${r.is_published ? 'badge-green' : 'badge-gray'}">${r.is_published ? 'Published' : 'Draft'}</span>${r.featured ? ' <span class="badge badge-yellow">Featured</span>' : ''}</td>
-        <td>${r.like_count}</td>
+        <td><span class="badge ${r.is_published ? 'badge-green' : 'badge-gray'}">${r.is_published ? 'Published' : 'Draft'}</span></td>
+        <td>${r.like_count || 0}</td>
         <td><div class="td-actions">
-          <button class="btn btn-sm btn-outline" onclick="editRecipe(${JSON.stringify(r).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn btn-sm btn-outline" onclick="editRecipeById(${r.id})">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="deleteRecipeById(${r.id})">Delete</button>
         </div></td>
       </tr>`).join('')
     }</tbody></table>`;
+  }
+
+  function editRecipeById(id) {
+    const r = _recipesCache[id];
+    if (!r) { showToast('Recipe not found', 'error'); return; }
+    editRecipe(r);
   }
 
   function newRecipe() {
