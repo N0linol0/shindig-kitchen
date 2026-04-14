@@ -41,4 +41,17 @@ router.get('/orders', async (req, res) => {
   }
 });
 
+router.get('/orders/mine', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const result = await pool.query(
+      'SELECT * FROM orders WHERE user_id=$1 ORDER BY created_at DESC',
+      [req.session.userId]
+    );
+    res.json({ orders: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

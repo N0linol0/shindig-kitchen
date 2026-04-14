@@ -108,4 +108,20 @@ router.post('/:id/save', requireAuth, async (req, res) => {
   }
 });
 
+router.get('/saved', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.*, c.name as category_name, c.slug as category_slug
+      FROM saved_recipes sr
+      JOIN recipes r ON sr.recipe_id = r.id
+      LEFT JOIN categories c ON r.category_id = c.id
+      WHERE sr.user_id = $1
+      ORDER BY r.title ASC
+    `, [req.session.userId]);
+    res.json({ recipes: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
