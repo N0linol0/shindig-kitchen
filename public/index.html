@@ -26,14 +26,14 @@
     .logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); cursor: pointer; }
     .logo em { color: var(--accent); font-style: italic; }
     .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a { font-size: 0.83rem; color: var(--muted); text-decoration: none; transition: color 0.2s; cursor: pointer; }
+    .nav-links a { font-size: 0.95rem; color: #4A4640; text-decoration: none; transition: color 0.2s; cursor: pointer; }
     .nav-links a:hover { color: var(--ink); }
     .nav-links a.shop { color: var(--accent); font-weight: 500; }
     .nav-right { display: flex; align-items: center; gap: 1.75rem; }
-    .nav-icon-btn { background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 5px; font-size: 0.83rem; font-family: var(--font-body); transition: color 0.2s; padding: 0; }
+    .nav-icon-btn { background: none; border: none; cursor: pointer; color: #4A4640; display: flex; align-items: center; gap: 5px; font-size: 0.95rem; font-family: var(--font-body); transition: color 0.2s; padding: 0; }
     .nav-icon-btn:hover { color: var(--ink); }
     .nav-icon-btn svg { width: 16px; height: 16px; stroke-width: 1.75; }
-    .nav-auth-btn { background: none; border: none; cursor: pointer; font-size: 0.83rem; font-family: var(--font-body); color: var(--muted); transition: color 0.2s; padding: 0; }
+    .nav-auth-btn { background: none; border: none; cursor: pointer; font-size: 0.95rem; font-family: var(--font-body); color: #4A4640; transition: color 0.2s; padding: 0; }
     .nav-auth-btn:hover { color: var(--ink); }
     .nav-user { display: flex; align-items: center; gap: 8px; }
     .nav-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 500; }
@@ -41,7 +41,7 @@
     /* CATEGORY STRIP */
     .category-strip { display: flex; padding: 0 3rem; overflow-x: auto; scrollbar-width: none; }
     .category-strip::-webkit-scrollbar { display: none; }
-    .cat-pill { flex-shrink: 0; padding: 0.65rem 0; margin-right: 2rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; background: none; border: none; font-family: var(--font-body); transition: color 0.2s; white-space: nowrap; position: relative; }
+    .cat-pill { flex-shrink: 0; padding: 0.65rem 0; margin-right: 2rem; font-size: 0.95rem; color: #4A4640; cursor: pointer; background: none; border: none; font-family: var(--font-body); transition: color 0.2s; white-space: nowrap; position: relative; }
     .cat-pill::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
     .cat-pill:hover { color: var(--ink); }
     .cat-pill.active { color: var(--ink); font-weight: 500; }
@@ -129,17 +129,17 @@
     .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
     .footer-newsletter-label { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
     .footer-newsletter-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.3rem; }
-    .footer-newsletter-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+    .footer-newsletter-desc { font-size: 0.95rem; color: #4A4640; line-height: 1.6; }
     .footer-newsletter-form { display: flex; gap: 8px; flex-shrink: 0; }
-    .footer-newsletter-input { font-family: var(--font-body); font-size: 0.875rem; color: var(--ink); background: var(--surface); border: none; border-radius: 4px; padding: 10px 16px; width: 220px; outline: none; transition: box-shadow 0.2s; }
+    .footer-newsletter-input { font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); background: var(--surface); border: none; border-radius: 4px; padding: 10px 16px; width: 220px; outline: none; transition: box-shadow 0.2s; }
     .footer-newsletter-input:focus { box-shadow: 0 0 0 2px rgba(74,103,65,0.2); }
-    .footer-newsletter-input::placeholder { color: var(--muted); }
+    .footer-newsletter-input::placeholder { color: #4A4640; }
     .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .footer-logo { font-family: var(--font-display); font-size: 1.1rem; cursor: pointer; }
     .footer-logo em { color: var(--accent); font-style: italic; }
-    .footer-copy { font-size: 0.75rem; color: var(--muted); }
+    .footer-copy { font-size: 0.9rem; color: #4A4640; }
     .footer-social { display: flex; gap: 1.1rem; align-items: center; }
-    .footer-social a { color: var(--muted); transition: color 0.2s; display: flex; align-items: center; cursor: pointer; }
+    .footer-social a { color: #4A4640; transition: color 0.2s; display: flex; align-items: center; cursor: pointer; }
     .footer-social a:hover { color: var(--ink); }
     .footer-social a svg { width: 18px; height: 18px; }
 
@@ -153,9 +153,9 @@
     .recipe-page-header { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; margin-bottom: 2rem; }
     .recipe-page-category { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
     .recipe-page-title { font-family: var(--font-display); font-size: 2.4rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 0.85rem; }
-    .recipe-page-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.8; max-width: 580px; }
+    .recipe-page-desc { font-size: 0.95rem; color: #4A4640; line-height: 1.8; max-width: 580px; }
     .recipe-page-actions { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
-    .recipe-action-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-family: var(--font-body); display: flex; align-items: center; gap: 6px; font-size: 0.82rem; transition: color 0.2s; padding: 4px 0; }
+    .recipe-action-btn { background: none; border: none; cursor: pointer; color: #4A4640; font-family: var(--font-body); display: flex; align-items: center; gap: 6px; font-size: 0.95rem; transition: color 0.2s; padding: 4px 0; }
     .recipe-action-btn svg { width: 15px; height: 15px; stroke-width: 1.75; }
     .recipe-action-btn:hover, .recipe-action-btn.active { color: var(--accent); }
 
@@ -463,8 +463,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   lucide.createIcons();
   await checkSession();
   await Promise.all([loadHomepage(), loadNavMenu()]);
-  renderStaticRecipe();
-  loadStaticComments();
 });
 
 // AUTH
@@ -561,26 +559,8 @@ function recipeCardHTML(r) {
   </article>`;
 }
 
-const STATIC_CARDS = [
-  {cat:'mains',e:'🥔',meta:'Mains · Vegan · 70 min',title:'Crispy Smashed Potatoes with Herby Vegan Ranch',desc:'Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing.',time:'Serves 4',slug:'crispy-smashed-potatoes'},
-  {cat:'canning',e:'🍑',meta:'Canning · 45 min',title:'Peach Vanilla Jam',desc:'Sun-ripened peaches with Madagascar vanilla bean.',time:'Makes 6 half-pints',slug:''},
-  {cat:'pickles',e:'🥒',meta:'Pickles · 30 min',title:'Garlic Dill Pickles',desc:'Classic and crisp with plenty of fresh dill, whole garlic cloves, and a bold brine.',time:'Makes 4 quarts',slug:''},
-  {cat:'sauces',e:'🍅',meta:'Sauces · 1 hr 20 min',title:'Roasted Tomato Salsa',desc:'Charred Roma tomatoes, smoked jalapeños, and fresh cilantro.',time:'Makes 8 pints',slug:''},
-  {cat:'baking',e:'🍞',meta:'Baking · 2 hrs',title:'Sourdough Focaccia',desc:'Open-crumb, crispy-edged, dimpled with olive oil.',time:'Serves 8',slug:''},
-  {cat:'canning',e:'🫐',meta:'Canning · 50 min',title:'Blueberry Lavender Jam',desc:'Floral and fragrant with fresh culinary lavender.',time:'Makes 5 half-pints',slug:''},
-];
-
 function staticCards() {
-  return STATIC_CARDS.map(c=>`<article class="recipe-card" data-cat="${c.cat}" onclick="${c.slug?`openRecipe('${c.slug}')`:'void(0)'}">
-    <div class="recipe-img" style="font-size:3rem;">${c.e}<button class="save-btn" onclick="event.stopPropagation();handleSave(null,this)"><i data-lucide="bookmark"></i></button></div>
-    <div class="r-meta">${c.meta}</div><h3 class="r-title">${c.title}</h3><p class="r-desc">${c.desc}</p>
-    <div class="r-foot"><span class="r-time">${c.time}</span>
-      <div class="r-actions">
-        <button class="r-btn" onclick="event.stopPropagation();handleLike(null,this)"><i data-lucide="heart"></i> <span>0</span></button>
-        <button class="r-btn" onclick="event.stopPropagation();handleShare('${c.title}')"><i data-lucide="share-2"></i></button>
-      </div>
-    </div>
-  </article>`).join('');
+  return '<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--muted);font-size:0.95rem;">No recipes published yet.</div>';
 }
 
 async function openRecipe(slug) {
@@ -590,7 +570,15 @@ async function openRecipe(slug) {
     const d = await res.json();
     if (d.recipe) { currentRecipe=d.recipe; renderRecipePage(d.recipe); loadComments(d.recipe.id); return; }
   } catch(e) {}
-  renderStaticRecipe(); loadStaticComments();
+  // Recipe not found
+  document.getElementById('rp-title').textContent = 'Recipe not found';
+  document.getElementById('rp-desc').textContent = 'This recipe could not be loaded.';
+  document.getElementById('rp-hero').innerHTML = '🍴';
+  document.getElementById('rp-ingredients').innerHTML = '';
+  document.getElementById('rp-steps').innerHTML = '';
+  document.getElementById('rp-notes').innerHTML = '';
+  document.getElementById('comments-list').innerHTML = '';
+  lucide.createIcons();
 }
 
 function renderRecipePage(r) {
@@ -610,51 +598,6 @@ function renderRecipePage(r) {
   const stps = Array.isArray(r.steps) ? r.steps : JSON.parse(r.steps||'[]');
   renderIngs(ings); renderSteps(stps);
   document.getElementById('rp-notes').innerHTML = r.notes ? `<div class="recipe-notes"><div class="recipe-notes-title">Cook's notes</div><div class="recipe-notes-text">${r.notes}</div></div>` : '';
-  lucide.createIcons();
-}
-
-// STATIC RECIPE DATA
-const STATIC_INGS = [
-  {group:'Potatoes',items:[{name:'Baby Yukon Gold potatoes',imp:[3.5,'oz'],met:[100,'g']},{name:'Olive oil spray',fixed:'as needed'},{name:'Salt & cracked black pepper',fixed:'to taste'}]},
-  {group:'Salad',items:[{name:'Persian cucumber, deseeded & diced',count:1},{name:'Small red onion, finely chopped',count:1}]},
-  {group:'Dressing',items:[
-    {name:'Vegan Greek yogurt',imp:[0.0625,'cup'],met:[60,'ml']},
-    {name:'Vegan mayonnaise',imp:[0.125,'cup'],met:[120,'ml']},
-    {name:'Garlic clove, minced',count:1},
-    {name:'Dijon mustard',imp:[0.25,'tbsp'],met:[15,'ml']},
-    {name:'Wholegrain mustard',imp:[0.25,'tbsp'],met:[15,'ml']},
-    {name:'Fresh dill, chopped',imp:[0.0625,'cup'],met:[60,'ml']},
-    {name:'Flat-leaf parsley, chopped',imp:[0.75,'tbsp'],met:[45,'ml']},
-    {name:'Chives, chopped',imp:[0.75,'tbsp'],met:[45,'ml']},
-    {name:'Cracked black pepper',imp:[0.0625,'tsp'],met:[1.25,'ml']},
-    {name:'Lemon, juiced',count:1},
-  ]}
-];
-
-const STATIC_STEPS = [
-  {title:'Boil the potatoes',text:'Bring a large pot of well-salted water to a boil. Add the potatoes and cook until completely fork-tender, about 10–15 minutes. Drain and let steam-dry for a few minutes.'},
-  {title:'Prep the salad',text:'While the potatoes cook, finely dice the cucumber and chop the red onion. Set aside in a bowl — you\'ll dress them later.'},
-  {title:'Make the dressing',text:'Whisk together the yogurt, mayo, garlic, both mustards, dill, parsley, chives, pepper, and lemon juice until smooth and creamy. Taste and adjust salt as needed.'},
-  {title:'Smash and season',text:'Preheat your oven to 425°F (220°C). Press each potato flat with the bottom of a glass — about ¼ inch thick. Spray generously with olive oil, season, and spray once more.'},
-  {title:'Roast until craggly and golden',text:'Roast for 40–50 minutes until deeply golden and crispy at the edges. Don\'t rush this — the color is the flavor. No need to flip.'},
-  {title:'Rest the potatoes, dress the salad',text:'Let the potatoes cool for 10 minutes — this keeps them crispy and stops the dressing from turning watery. Toss the cucumber and onion into the dressing bowl.'},
-  {title:'Toss and serve',text:'Add half the rested potatoes to the salad and toss gently. Pile into a serving dish and scatter the remaining crispy potatoes over the top. Serve straight away.'},
-];
-
-function renderStaticRecipe() {
-  currentRecipe = null;
-  document.getElementById('rp-title').textContent = 'Crispy Smashed Potatoes with Herby Vegan Ranch';
-  document.getElementById('rp-title-crumb').textContent = 'Crispy Smashed Potatoes';
-  document.getElementById('rp-cat-crumb').textContent = 'Mains';
-  document.getElementById('rp-category').textContent = 'Mains · Vegan';
-  document.getElementById('rp-desc').textContent = 'Shatteringly crispy smashed potatoes tossed with a bright, herb-packed vegan dressing and fresh cucumber. A side dish that tends to disappear fast.';
-  document.getElementById('rp-like-count').textContent = '34';
-  document.getElementById('rp-prep').textContent = '15 min';
-  document.getElementById('rp-cook').textContent = '55 min';
-  document.getElementById('rp-total').textContent = '70 min';
-  document.getElementById('rp-hero').innerHTML = '🥔';
-  renderIngs(STATIC_INGS); renderSteps(STATIC_STEPS);
-  document.getElementById('rp-notes').innerHTML = `<div class="recipe-notes"><div class="recipe-notes-title">Cook's notes</div><div class="recipe-notes-text">Vegan by design, but works equally well with regular Greek yogurt and mayo. The dressing is also excellent as a dip for crudités — make a double batch and thank yourself later.</div></div>`;
   lucide.createIcons();
 }
 
@@ -701,14 +644,18 @@ function setUnit(u) {
   unit=u;
   document.getElementById('btn-imp').classList.toggle('active',u==='imperial');
   document.getElementById('btn-met').classList.toggle('active',u==='metric');
-  const ings=currentRecipe?(Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]')):STATIC_INGS;
-  renderIngs(ings);
+  if (currentRecipe) {
+    const ings=Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]');
+    renderIngs(ings);
+  }
 }
 
 function setPortions(p) {
   portions=p;
-  const ings=currentRecipe?(Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]')):STATIC_INGS;
-  renderIngs(ings);
+  if (currentRecipe) {
+    const ings=Array.isArray(currentRecipe.ingredients)?currentRecipe.ingredients:JSON.parse(currentRecipe.ingredients||'[]');
+    renderIngs(ings);
+  }
 }
 
 // COMMENTS
@@ -725,19 +672,10 @@ async function loadComments(recipeId) {
       return `<div class="comment"><div class="comment-avatar">${init}</div><div class="comment-body"><div class="comment-author">${c.display_name||c.username}</div><div class="comment-date">${date}</div><div class="comment-text">${c.body}</div><button class="comment-like-btn"><i data-lucide="heart"></i> ${c.like_count} likes</button></div></div>`;
     }).join('');
     lucide.createIcons();
-  } catch(e) { loadStaticComments(); }
+  } catch(e) { document.getElementById('comments-list').innerHTML='<p style="font-size:0.95rem;color:var(--muted);">Comments unavailable.</p>'; }
   updateCommentForm();
 }
 
-function loadStaticComments() {
-  document.getElementById('rp-comment-count').textContent='(2)';
-  document.getElementById('comments-list').innerHTML=[
-    {i:'ML',a:'Marie L.',d:'March 12, 2025',t:'Made this for a dinner party and everyone went back for seconds. The dressing is absolutely addictive — I made a double batch exactly as suggested.',l:3},
-    {i:'TK',a:'Tom K.',d:'February 28, 2025',t:'The 10-minute rest tip is crucial — I skipped it the first time and the potatoes went soft. Second attempt was perfect.',l:1},
-  ].map(c=>`<div class="comment"><div class="comment-avatar">${c.i}</div><div class="comment-body"><div class="comment-author">${c.a}</div><div class="comment-date">${c.d}</div><div class="comment-text">${c.t}</div><button class="comment-like-btn"><i data-lucide="heart"></i> ${c.l} likes</button></div></div>`).join('');
-  lucide.createIcons();
-  updateCommentForm();
-}
 
 function updateCommentForm() {
   const note=document.getElementById('comment-note');
@@ -998,31 +936,16 @@ function fallbackHomepage() {
   const container = document.getElementById('homepage-dynamic');
   if (!container) return;
   container.innerHTML = `
-    <div class="hero">
-      <div class="hero-bg"><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="100" r="80" stroke="white" stroke-width="1"/><path d="M60 130 Q100 60 140 130" stroke="white" stroke-width="1" fill="none"/><circle cx="100" cy="80" r="12" fill="white"/></svg></div>
-      <div class="hero-fade"></div><div class="hero-fade-bottom"></div>
-      <div class="hero-content">
-        <div class="hero-tag">✦ Featured this week</div>
-        <h1 class="hero-title">Strawberry<br><em>Balsamic</em><br>Preserves</h1>
-        <p class="hero-desc">Peak-season strawberries slow-cooked with aged balsamic and a whisper of black pepper.</p>
-        <div class="hero-actions">
-          <button class="btn-filled" onclick="showPage('recipe');renderStaticRecipe();loadStaticComments()">View recipe</button>
-          <button class="btn-bare">See all canning →</button>
-        </div>
-      </div>
-      <div class="hero-badge">
-        <div class="badge-label">Now trending</div>
-        <div class="badge-title">Strawberry Balsamic Jam</div>
-        <div class="badge-actions">
-          <button class="icon-btn" onclick="handleLike('hero',this)"><i data-lucide="heart"></i> <span>142</span></button>
-          <button class="icon-btn" onclick="handleShare('Strawberry Balsamic Preserves')"><i data-lucide="share-2"></i> Share</button>
-          <button class="icon-btn" onclick="handleSave('hero',this)"><i data-lucide="bookmark"></i> Save</button>
-        </div>
+    <div class="hero" style="display:flex;align-items:center;justify-content:center;min-height:400px;">
+      <div class="hero-fade"></div>
+      <div style="position:relative;z-index:2;text-align:center;padding:3rem;">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:600;color:white;margin-bottom:1rem;">Welcome to Shindig<em style="color:#A8C9A0;font-style:italic;">Kitchen</em></div>
+        <p style="font-size:0.95rem;color:rgba(255,255,255,0.65);max-width:400px;line-height:1.75;">Set up your homepage in the admin panel — add a featured recipe, recipe grids, and more.</p>
       </div>
     </div>
     <div class="section">
-      <div class="section-header"><h2 class="section-title">Recent recipes</h2><button class="section-link">Browse all →</button></div>
-      <div class="recipe-grid" id="recipe-grid">${staticCards()}</div>
+      <div class="section-header"><h2 class="section-title">Recipes</h2><button class="section-link">Browse all →</button></div>
+      <div class="recipe-grid" id="recipe-grid"></div>
     </div>`;
   lucide.createIcons();
   loadRecipes();
